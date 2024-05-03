@@ -262,7 +262,7 @@ def main():
             authenticate_user(pwd_input)
             pwd_placeholder.empty()  # Clears the password input after button press
     if st.session_state['authenticated']:
-        st.sidebar.title("Navigation")
+        st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
 
         if option == "Create PRD":
