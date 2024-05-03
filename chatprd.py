@@ -7,8 +7,7 @@ import os
 # Set up the OpenAI API client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Setting a hardcoded password for demonstration purposes
-# NOTE: For production, consider a more secure authentication method
+# Setting a hardcoded password for auth
 PASSWORD = os.getenv('PASSWORD')
 
 # Using Streamlit's session state to store the authentication status
@@ -268,6 +267,10 @@ def main():
             create_prd()
         elif option == "Improve PRD":
             improve_prd()
+        #elif option == "Brainstorm Features":
+            #brainstorm_features()
+        elif option == "View History":
+            view_history()
 
 if __name__ == "__main__":
     main()
