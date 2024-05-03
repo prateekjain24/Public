@@ -7,6 +7,20 @@ import os
 # Set up the OpenAI API client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# Setting a hardcoded password for demonstration purposes
+# NOTE: For production, consider a more secure authentication method
+PASSWORD = os.getenv('PASSWORD')
+
+# Using Streamlit's session state to store the authentication status
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
+
+def authenticate_user(password):
+    if password == PASSWORD:
+        st.session_state['authenticated'] = True
+    else:
+        st.error("Incorrect password, please try again.")
+
 # Using Streamlit's session state to store temporary memory
 if 'history' not in st.session_state:
     st.session_state['history'] = []
@@ -240,17 +254,20 @@ def view_history():
 
 def main():
     st.title("Product Management Assistant")
-    st.sidebar.title("Navigation")
-    option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD", "Brainstorm Features", "View History"))
+    if not st.session_state['authenticated']:
+        pwd_placeholder = st.empty()
+        pwd_input = pwd_placeholder.text_input("Enter your password:", type="password")
+        if st.button("Login"):
+            authenticate_user(pwd_input)
+            pwd_placeholder.empty()  # Clears the password input after button press
+    else:
+        st.sidebar.title("Navigation")
+        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD"))
 
-    if option == "Create PRD":
-        create_prd()
-    elif option == "Improve PRD":
-        improve_prd()
-    elif option == "Brainstorm Features":
-        brainstorm_features()
-    elif option == "View History":
-        view_history()
+        if option == "Create PRD":
+            create_prd()
+        elif option == "Improve PRD":
+            improve_prd()
 
 if __name__ == "__main__":
     main()
