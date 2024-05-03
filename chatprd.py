@@ -262,14 +262,14 @@ def main():
             pwd_placeholder.empty()  # Clears the password input after button press
     if st.session_state['authenticated']:
         st.sidebar.title("Navigation")
-        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD"))
+        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
 
         if option == "Create PRD":
             create_prd()
         elif option == "Improve PRD":
             improve_prd()
-        #elif option == "Brainstorm Features":
-            #brainstorm_features()
+        elif option == "Brainstorm Features":
+            brainstorm_features()
         elif option == "View History":
             view_history()
 
