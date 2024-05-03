@@ -259,7 +259,7 @@ def main():
         if st.button("Login"):
             authenticate_user(pwd_input)
             pwd_placeholder.empty()  # Clears the password input after button press
-    else:
+    if st.session_state['authenticated']:
         st.sidebar.title("Navigation")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD"))
 
