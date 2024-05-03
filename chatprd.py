@@ -58,7 +58,7 @@ def create_prd():
     ValueError: If the product name or description is not provided.
     """
     system_prompt = """
-    You are a Senior Product Manager working for PropertyGuru. Your language is engaging but uses Simple english & No Buzz words.  Given the objective, create a detailed PRD. The PRD should outline the problem, propose a solution, and include specific sections such as goals, user stories, user experience flow, success metrics, technical considerations, and milestones. Follow the structure provided below:
+    You are a Senior Product Manager working for PropertyGuru. You pride yourself with attention to detail & provide detailed response. Your language is engaging & have character but uses Simple english & No Buzz words.  Given the objective, create a detailed PRD. The PRD should outline the problem, propose a solution, and include specific sections such as goals, user stories, user experience flow, success metrics, technical considerations, and milestones. Follow the structure provided below:
 
     ### PRD Outline for KYC Feature with OTP Verified Login
 
@@ -101,7 +101,7 @@ def create_prd():
 
     st.subheader("Create New PRD")
     product_name = st.text_input("Product Name", placeholder="Enter the product name here")
-    product_description = st.text_area("Product Description", placeholder="Describe the product here")
+    product_description = st.text_area("Product Description", placeholder="Describe the product here. Use bullet points where possible")
     generate_button = st.button("Generate PRD")
 
     if generate_button:
@@ -139,7 +139,7 @@ def improve_prd():
     Exception: If there is an error while improving the PRD.
     """
     system_prompt = """
-    You are a Senior Product Manager working for PropertyGuru. Your language is engaging but uses Simple english & No Buzz words.  Given the objective, create a detailed PRD. The PRD should outline the problem, propose a solution, and include specific sections such as goals, user stories, user experience flow, success metrics, technical considerations, and milestones. Follow the structure provided below:
+    You are a Senior Product Manager working for PropertyGuru. You pride yourself with attention to detail & provide detailed response. Your language is engaging & have character but uses Simple english & No Buzz words.  Given the objective, create a detailed PRD. The PRD should outline the problem, propose a solution, and include specific sections such as goals, user stories, user experience flow, success metrics, technical considerations, and milestones. Follow the structure provided below:
 
     ### PRD Outline for KYC Feature with OTP Verified Login
 
@@ -239,7 +239,8 @@ def brainstorm_features():
                         messages=context
                     )
                     response = completion.choices[0].message.content
-                    st.text_area("Brainstormed Ideas", response, height=300)
+                    st.markdown(response, unsafe_allow_html=True)
+                    #st.text_area("Brainstormed Ideas", response, height=300)
                     st.session_state['history'].append({'role': 'user', 'content': response})
                 except Exception as e:
                     st.error(f"Failed to brainstorm features. Please try again later. Error: {str(e)}")
@@ -253,7 +254,7 @@ def view_history():
         st.info("No history available yet.")
 
 def main():
-    st.title("Product Management Assistant")
+    st.title("PM Assisistant")
     if not st.session_state['authenticated']:
         pwd_placeholder = st.empty()
         pwd_input = pwd_placeholder.text_input("Enter your password:", type="password")
