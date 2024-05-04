@@ -249,7 +249,7 @@ def main():
             pwd_placeholder.empty()  # Clears the password input after button press
     if st.session_state['authenticated']:
         st.sidebar.title("Select the Task:")
-        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
+        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD", "View History"))
 
         if option == "Create PRD":
             create_prd(system_prompt_prd,system_prompt_director, quality_llm)
