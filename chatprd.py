@@ -177,55 +177,31 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
                     st.error(f"Failed to improve PRD. Please try again later. Error: {str(e)}")
 
 def brainstorm_features(system_prompt_brainstorm,llm_model):
-    # Initialize session state variables if they don't exist
-    if 'chat_history' not in st.session_state:
-        st.session_state['chat_history'] = []
-    if 'input_sent' not in st.session_state:
-        st.session_state['input_sent'] = False
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-        # Function to display the chat history
-    def display_chat():
-        """ Displays each message in the chat history in a text area. """
-        for idx, message in enumerate(st.session_state['chat_history']):
-            # Using index in key to ensure uniqueness
-            st.text_area('', value=f"{message['role']}: {message['content']}", height=75, disabled=True, key=str(idx))
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-    # Function to add messages to chat history
-    def add_message(role, content):
-        """ Appends a message with role and content to the chat history. """
-        st.session_state['chat_history'].append({'role': role, 'content': content})
-        display_chat()
-
-    # Function to get chat history
-    def get_last_messages(n=4):
-        """ Retrieves the last 'n' messages from the chat history, formatted for sending to the LLM. """
-        # This returns a list of the last 'n' messages, each formatted as a string "role: content"
-        return [{"role": msg['role'], "content": msg['content']} for msg in st.session_state['chat_history'][-n:]]
-
-    display_chat()  # Call to display the chat history
-
-    topic = st.text_input("Enter a topic for brainstorming", key="brainstorm_input")
-    send_button = st.button("Brainstorm")
-
-    if send_button:
-        if not topic:
-            st.warning("Please enter a topic to brainstorm.")
-        else:
-            add_message("User", topic)
-            context = get_last_messages()  # Get the last four messages as context
-
-            with st.spinner('Brainstorming features...'):
-                try:
-                    # Making an LLM call with the user input and the context
-                    response = llm_model.prompt(
-                        f"User input: {topic}, Previous Context: {context}",
+    # React to user input
+    if prompt := st.chat_input("What  would you like to brainstorm on today?"):
+        # Display user message in chat message container
+        st.chat_message("user").markdown(prompt)
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        context = st.session_state.messages[-6:]
+        response = llm_model.prompt(
+                        f"User input: {prompt}, Previous Context: {context}",
                         system=system_prompt_brainstorm
                     )
-                    # Assume response.text() extracts the relevant text from the response object
-                    brainstorm_response = response.text()
-                    add_message("System", brainstorm_response)  # Add system response to chat history
-                except Exception as e:
-                    add_message("System", f"Failed to brainstorm features. Please try again later. Error: {str(e)}")
+        # Display assistant response in chat message container
+        with st.chat_message("assistant"):
+            st.markdown(response)
+        # Add assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
 def view_history():
     st.subheader("View History")
@@ -250,7 +226,7 @@ def main():
             pwd_placeholder.empty()  # Clears the password input after button press
     if st.session_state['authenticated']:
         st.sidebar.title("Select the Task:")
-        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD", "View History"))
+        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
 
         if option == "Create PRD":
             create_prd(system_prompt_prd,system_prompt_director, quality_llm)
