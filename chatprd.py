@@ -96,7 +96,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
                         f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format. BE DETAILED. If you think user is not asking for PRD return nothing.",
                             system=system_prompt_prd
                     )
-                    os.write(1, f"Name:{product_name} \n {product_description}")
+                    #os.write(1, f"Name:{product_name} \n {product_description}")
                     st.session_state['history'].append({'role': 'user', 'content': draft_prd.text()})
                     status_message = "Draft PRD Complete. Now Critiquing the draft PRD"
                     st.info(status_message)
