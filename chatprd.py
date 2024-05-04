@@ -182,18 +182,7 @@ def brainstorm_features(system_prompt_brainstorm,llm_model):
     if 'input_sent' not in st.session_state:
         st.session_state['input_sent'] = False
 
-    # Function to add messages to chat history
-    def add_message(role, content):
-        """ Appends a message with role and content to the chat history. """
-        st.session_state['chat_history'].append({'role': role, 'content': content})
-
-    # Function to get chat history
-    def get_last_messages(n=4):
-        """ Retrieves the last 'n' messages from the chat history, formatted for sending to the LLM. """
-        # This returns a list of the last 'n' messages, each formatted as a string "role: content"
-        return [{"role": msg['role'], "content": msg['content']} for msg in st.session_state['chat_history'][-n:]]
-
-    # Function to display the chat history
+        # Function to display the chat history
     def display_chat():
         """ Displays each message in the chat history in a text area. """
         for message in st.session_state['chat_history']:
@@ -202,6 +191,18 @@ def brainstorm_features(system_prompt_brainstorm,llm_model):
                 st.text_area('', value=content, height=75, disabled=True, key=message[:15])
             else:
                 st.text_area('', value=content, height=75, disabled=True, style={"background-color": "#f0f2f6"}, key=message[:15])
+
+    # Function to add messages to chat history
+    def add_message(role, content):
+        """ Appends a message with role and content to the chat history. """
+        st.session_state['chat_history'].append({'role': role, 'content': content})
+        display_chat()
+
+    # Function to get chat history
+    def get_last_messages(n=4):
+        """ Retrieves the last 'n' messages from the chat history, formatted for sending to the LLM. """
+        # This returns a list of the last 'n' messages, each formatted as a string "role: content"
+        return [{"role": msg['role'], "content": msg['content']} for msg in st.session_state['chat_history'][-n:]]
 
     display_chat()  # Call to display the chat history
 
