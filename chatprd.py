@@ -3,6 +3,7 @@ from openai import OpenAI
 #from dotenv import load_dotenv
 import llm
 import os
+import json
 #load_dotenv()
 # Set up the OpenAI API client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -14,26 +15,49 @@ PASSWORD = os.getenv('PASSWORD')
 if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = False
 
+# Using Streamlit's session state to store temporary memory
+if 'history' not in st.session_state:
+    st.session_state['history'] = []
+
 def authenticate_user(password):
+    """
+    Authenticates the user by comparing the given password with the hardcoded password.
+    Args:
+        password (str): The password provided by the user.
+    Raises:
+        ValueError: If the password is incorrect.
+    Returns:
+        None: None
+    """
     if password == PASSWORD:
         st.session_state['authenticated'] = True
         st.rerun()
     else:
         st.error("Incorrect password, please try again.")
 
-# Using Streamlit's session state to store temporary memory
-if 'history' not in st.session_state:
-    st.session_state['history'] = []
+def load_prompts():
+    """
+    Loads the prompts from a JSON file.
+    Parameters:
+        None
+    Returns:
+        dict: A dictionary containing the loaded prompts.
+    Raises:
+        FileNotFoundError: If the 'prompts.json' file is not found.
+        json.JSONDecodeError: If the 'prompts.json' file is not in a valid JSON format.
+    Usage:
+        The function reads the 'prompts.json' file and returns a dictionary containing the loaded prompts.
+    """
+    with open('prompts.json', 'r') as file:
+        return json.load(file)
 
 def build_models():
     """
     Builds and initializes the GPT-3.5-turbo and GPT-4-turbo models.
-
     Returns:
-    tuple: A tuple containing the initialized GPT-3.5-turbo and GPT-4-turbo models.
-
+        tuple: A tuple containing the initialized GPT-3.5-turbo and GPT-4-turbo models.
     Raises:
-    ValueError: If the OPENAI_API_KEY environment variable is not set.
+        ValueError: If the OPENAI_API_KEY environment variable is not set.
     """
     gpt3_model = llm.get_model("gpt-3.5-turbo")
     gpt3_model.key = os.getenv("OPENAI_API_KEY")
@@ -43,60 +67,16 @@ def build_models():
 
     return gpt3_model, gpt4_model
 
-def create_prd():
+def create_prd(system_prompt_prd,system_prompt_director):
     """
     Generate a new Product Requirements Document (PRD) based on the provided information.
-
     Parameters:
-    product_name (str): The name of the product.
-    product_description (str): A description of the product.
-
+        product_name (str): The name of the product.
+        product_description (str): A description of the product.
     Returns:
-    str: The generated PRD.
-
+        str: The generated PRD.
     Raises:
-    ValueError: If the product name or description is not provided.
-    """
-    system_prompt = """
-    You are a Senior Product Manager working for PropertyGuru. You pride yourself with attention to detail & provide detailed response. Your language is engaging & have character but uses Simple english & No Buzz words.  Given the objective, create a detailed PRD. The PRD should outline the problem, propose a solution, and include specific sections such as goals, user stories, user experience flow, success metrics, technical considerations, and milestones. Follow the structure provided below:
-
-    ### PRD Outline for KYC Feature with OTP Verified Login
-
-    #### tl;dr
-
-    Provide a brief overview of the feature, emphasizing the introduction of a secure, OTP verified mobile login to enhance KYC compliance and ensure a frictionless yet secure user authentication process.
-
-    #### Goals
-
-    Divide the goals into Business Goals and User Goals, detailing how the feature will increase security, comply with regulations, and improve user satisfaction.
-
-    #### Non-Goals
-
-    List what the feature will not aim to achieve at this stage, such as replacing other forms of authentication or implementing additional security measures like biometric verification.
-
-    #### User Stories
-
-    Outline the key user stories that this feature will address, focusing on the needs of both the users and the administrators of the platform.
-
-    #### User Experience - Step by Step Flow
-
-    Describe the step-by-step user interaction flow from registration or login to successful account access, emphasizing the OTP verification process.
-
-    #### Narrative
-
-    Explain the importance and impact of integrating an OTP verified mobile login, addressing how it will improve security and user trust while complying with KYC regulations.
-
-    #### Success Metrics
-
-    Identify the metrics that will measure the success of this feature, such as reductions in unauthorized access attempts and user feedback on the login process.
-
-    #### Technical Considerations
-
-    Discuss the technical requirements and considerations, including third-party integrations, compliance issues, and scalability challenges.
-
-    #### Milestones & Sequencing
-
-    Detail the timeline and key milestones for the development and implementation of the feature, from initial research to deployment and monitoring post-launch.
+        ValueError: If the product name or description is not provided.
     """
 
     st.subheader("Create New PRD")
@@ -113,7 +93,7 @@ def create_prd():
                     completion = client.chat.completions.create(
                         model="gpt-4-turbo",
                         messages=[
-                            {"role": "system", "content": system_prompt},
+                            {"role": "system", "content": system_prompt_prd},
                             {"role": "user", "content": f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format"}
                         ]
                     )
@@ -124,60 +104,16 @@ def create_prd():
                 except Exception as e:
                     st.error(f"Failed to generate PRD. Please try again later. Error: {str(e)}")
 
-def improve_prd():
+def improve_prd(system_prompt_prd,system_prompt_director):
     """
-    Improve the provided Product Requirements Document (PRD) using GPT-3.5-turbo.
-
+    Improve the provided Product Requirements Document (PRD) using GPT-4-turbo.
     Parameters:
-    prd_text (str): The text of the PRD to be improved.
-
+        prd_text (str): The text of the PRD to be improved.
     Returns:
-    str: The improved PRD.
-
+        str: The improved PRD.
     Raises:
-    ValueError: If no PRD text is provided.
-    Exception: If there is an error while improving the PRD.
-    """
-    system_prompt = """
-    You are a Senior Product Manager working for PropertyGuru. You pride yourself with attention to detail & provide detailed response. Your language is engaging & have character but uses Simple english & No Buzz words.  Given the objective, create a detailed PRD. The PRD should outline the problem, propose a solution, and include specific sections such as goals, user stories, user experience flow, success metrics, technical considerations, and milestones. Follow the structure provided below:
-
-    ### PRD Outline for KYC Feature with OTP Verified Login
-
-    #### tl;dr
-
-    Provide a brief overview of the feature, emphasizing the introduction of a secure, OTP verified mobile login to enhance KYC compliance and ensure a frictionless yet secure user authentication process.
-
-    #### Goals
-
-    Divide the goals into Business Goals and User Goals, detailing how the feature will increase security, comply with regulations, and improve user satisfaction.
-
-    #### Non-Goals
-
-    List what the feature will not aim to achieve at this stage, such as replacing other forms of authentication or implementing additional security measures like biometric verification.
-
-    #### User Stories
-
-    Outline the key user stories that this feature will address, focusing on the needs of both the users and the administrators of the platform.
-
-    #### User Experience - Step by Step Flow
-
-    Describe the step-by-step user interaction flow from registration or login to successful account access, emphasizing the OTP verification process.
-
-    #### Narrative
-
-    Explain the importance and impact of integrating an OTP verified mobile login, addressing how it will improve security and user trust while complying with KYC regulations.
-
-    #### Success Metrics
-
-    Identify the metrics that will measure the success of this feature, such as reductions in unauthorized access attempts and user feedback on the login process.
-
-    #### Technical Considerations
-
-    Discuss the technical requirements and considerations, including third-party integrations, compliance issues, and scalability challenges.
-
-    #### Milestones & Sequencing
-
-    Detail the timeline and key milestones for the development and implementation of the feature, from initial research to deployment and monitoring post-launch.
+        ValueError: If no PRD text is provided.
+        Exception: If there is an error while improving the PRD.
     """
     st.subheader("Improve Current PRD")
     prd_text = st.text_area("Enter your PRD here", placeholder="Paste your PRD here to improve it")
@@ -192,7 +128,7 @@ def improve_prd():
                     completion = client.chat.completions.create(
                         model="gpt-4-turbo",
                         messages=[
-                            {"role": "system", "content": f"You are a meticulous editor for improving product documents. {system_prompt}"},
+                            {"role": "system", "content": f"You are a meticulous editor for improving product documents. {system_prompt_prd}"},
                             {"role": "user", "content": f"Improve the following PRD: {prd_text}"}
                         ]
                     )
@@ -207,17 +143,14 @@ def brainstorm_features():
     """
     Brainstorm innovative features for a product based on a given topic.
     Parameters:
-    None
-
+        None
     Returns:
-    None
-
+        None
     Raises:
-    ValueError: If no topic is provided.
-    Exception: If there is an error while brainstorming features.
-
+        ValueError: If no topic is provided.
+        Exception: If there is an error while brainstorming features.
     Usage:
-    The function takes a topic as input and generates a list of innovative features for a product based on that topic. It uses the GPT-3.5-turbo model to generate the list of features. The generated list of features is displayed in a text area in the Streamlit interface.
+        The function takes a topic as input and generates a list of innovative features for a product based on that topic. It uses the GPT-3.5-turbo model to generate the list of features. The generated list of features is displayed in a text area in the Streamlit interface.
     """
     st.subheader("Brainstorm Features")
     topic = st.text_input("Enter a topic for brainstorming", placeholder="Enter the topic to brainstorm about")
@@ -254,6 +187,9 @@ def view_history():
         st.info("No history available yet.")
 
 def main():
+    prompts = load_prompts()
+    system_prompt_prd = prompts['system_prompt_prd']
+    system_prompt_director = prompts['system_prompt_director']
     st.title("PM Assisistant")
     if not st.session_state['authenticated']:
         pwd_placeholder = st.empty()
@@ -266,9 +202,9 @@ def main():
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
 
         if option == "Create PRD":
-            create_prd()
+            create_prd(system_prompt_prd,system_prompt_director)
         elif option == "Improve PRD":
-            improve_prd()
+            improve_prd(system_prompt_prd,system_prompt_director)
         elif option == "Brainstorm Features":
             brainstorm_features()
         elif option == "View History":
