@@ -13,3 +13,7 @@ def authenticate_user():
         st.session_state['authenticated'] = check_authentication(pwd_input)
         if not st.session_state['authenticated']:
             st.sidebar.error("Incorrect password, please try again.")
+        else:
+            st.session_state['authenticated'] = True
+            st.sidebar.success("Logged in successfully.")
+            st.rerun()
