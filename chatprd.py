@@ -67,12 +67,13 @@ def build_models():
 
     return gpt3_model, gpt4_model
 
-def create_prd(system_prompt_prd,system_prompt_director):
+def create_prd(system_prompt_prd,system_prompt_director, llm_model):
     """
     Generate a new Product Requirements Document (PRD) based on the provided information.
     Parameters:
         system_prompt_prd (str): A predefined system prompt for generating a PRD.
         system_prompt_director (str): A predefined system prompt for generating a PRD based on a director's input.
+        llm_model (llm.OpenAI): An initialized LLM model.
     Returns:
         str: The generated PRD.
     Raises:
@@ -90,26 +91,23 @@ def create_prd(system_prompt_prd,system_prompt_director):
         else:
             with st.spinner('Generating PRD...'):
                 try:
-                    completion = client.chat.completions.create(
-                        model="gpt-4-turbo",
-                        messages=[
-                            {"role": "system", "content": system_prompt_prd},
-                            {"role": "user", "content": f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format"}
-                        ]
-                    )
-                    response = completion.choices[0].message.content
+                    response = llm_model.prompt(
+                        f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format. BE DETAILED",
+                            system=system_prompt_prd
+                    )    
                     st.markdown(response, unsafe_allow_html=True)
                     #st.text_area("Generated PRD", response, height=300)
                     st.session_state['history'].append({'role': 'user', 'content': response})
                 except Exception as e:
                     st.error(f"Failed to generate PRD. Please try again later. Error: {str(e)}")
 
-def improve_prd(system_prompt_prd,system_prompt_director):
+def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
     """
     Improve the provided Product Requirements Document (PRD) using GPT-4-turbo.
     Parameters:
         system_prompt_prd (str): A predefined system prompt for generating a PRD.
         system_prompt_director (str): A predefined system prompt for generating a PRD based on a director's input.
+        llm_model (llm.OpenAI): An initialized LLM model.
     Returns:
         str: The improved PRD.
     Raises:
@@ -126,14 +124,10 @@ def improve_prd(system_prompt_prd,system_prompt_director):
         else:
             with st.spinner('Improving PRD...'):
                 try:
-                    completion = client.chat.completions.create(
-                        model="gpt-4-turbo",
-                        messages=[
-                            {"role": "system", "content": f"You are a meticulous editor for improving product documents. {system_prompt_prd}"},
-                            {"role": "user", "content": f"Improve the following PRD: {prd_text}"}
-                        ]
-                    )
-                    response = completion.choices[0].message.content
+                    response = llm_model.prompt(
+                        f"Improve the following PRD: {prd_text}",
+                            system=f"You are a meticulous editor for improving product documents. {system_prompt_prd}"
+                    )                      
                     st.markdown(response, unsafe_allow_html=True)
                     #st.text_area("Improved PRD", response, height=300)
                     st.session_state['history'].append({'role': 'user', 'content': response})
@@ -189,6 +183,7 @@ def view_history():
 
 def main():
     prompts = load_prompts()
+    fast_llm, quality_llm = build_models()
     system_prompt_prd = prompts['system_prompt_prd']
     system_prompt_director = prompts['system_prompt_director']
     st.title("PM Assisistant")
@@ -203,9 +198,9 @@ def main():
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
 
         if option == "Create PRD":
-            create_prd(system_prompt_prd,system_prompt_director)
+            create_prd(system_prompt_prd,system_prompt_director, quality_llm)
         elif option == "Improve PRD":
-            improve_prd(system_prompt_prd,system_prompt_director)
+            improve_prd(system_prompt_prd,system_prompt_director,quality_llm)
         elif option == "Brainstorm Features":
             brainstorm_features()
         elif option == "View History":
