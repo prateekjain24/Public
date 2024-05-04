@@ -5,3 +5,4 @@ numpy
 llm
 groq
 anthropic
+streamlit-pandas

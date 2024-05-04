@@ -1,4 +1,6 @@
 import json
+import pandas as pd
+import streamlit as st
 
 def load_prompts():
     """
@@ -15,4 +17,15 @@ def load_prompts():
     """
     with open('prompts.json', 'r') as file:
         return json.load(file)
+    pass
 
+def load_data(file):
+    """Load data from an uploaded file."""
+    if file.name.endswith('.csv'):
+        df = pd.read_csv(file)
+    elif file.name.endswith('.xlsx'):
+        df = pd.read_excel(file)
+    else:
+        st.error("Unsupported file format. Please upload a CSV or Excel file.")
+        return None
+    return df

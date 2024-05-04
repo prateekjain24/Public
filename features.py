@@ -1,5 +1,6 @@
 import streamlit as st
 from models import build_models
+from utils import load_data
 
 def create_prd(system_prompt_prd,system_prompt_director, llm_model):
     """
@@ -45,7 +46,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
                         f"Given the Feedback from your manager:{critique_response.text()} \n Improve upon your Draft PRD {draft_prd.text()}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED. If you think user is not asking for PRD return nothing.",
                             system=system_prompt_prd
                     )                                       
-                    st.markdown(response.text(), unsafe_allow_html=True)
+                    st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response.text()})
                     # Download button for the PRD
                     st.download_button(

@@ -4,7 +4,7 @@ from openai import OpenAI
 import llm
 import os
 from authentication import authenticate_user
-from features import create_prd, improve_prd, brainstorm_features, view_history
+from features import create_prd, improve_prd, brainstorm_features, view_history, dynamic_df
 from utils import load_prompts
 from models import build_models
 
@@ -20,8 +20,8 @@ def main():
     system_prompt_brainstorm = prompts['system_prompt_brainstorm']
     #Authenticate the user
     authenticate_user()
-    st.title("PM Assisistant")
     if st.session_state['authenticated']:
+        st.title("PM Assisistant")
         st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
 
