@@ -18,11 +18,9 @@ def main():
     system_prompt_prd = prompts['system_prompt_prd']
     system_prompt_director = prompts['system_prompt_director']
     system_prompt_brainstorm = prompts['system_prompt_brainstorm']
-    st.title("PM Assisistant")
-
     #Authenticate the user
     authenticate_user()
-
+    st.title("PM Assisistant")
     if st.session_state['authenticated']:
         st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))

@@ -9,7 +9,7 @@ def authenticate_user():
         st.session_state['authenticated'] = False
 
     # Create a placeholder for the login form
-    login_placeholder = st.sidebar.empty()
+    login_placeholder = st.empty()
 
     if not st.session_state['authenticated']:
         with login_placeholder.container():
