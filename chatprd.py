@@ -84,7 +84,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
     product_name = st.text_input("Product Name", placeholder="Enter the product name here")
     product_description = st.text_area("Product Description", placeholder="Describe the product here. Use bullet points where possible")
     generate_button = st.button("Generate PRD")
-    status_message = "'Generating PRD...'"
+    status_message = "Generating PRD..."
 
     if generate_button:
         if not product_name or not product_description:
@@ -104,7 +104,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
                             system=system_prompt_director
                     )
                     st.session_state['history'].append({'role': 'user', 'content': critique_response.text()})
-                    status_message = "Draft PRD Complete. Critiquing Done. Now Generating the final PRD"
+                    status_message = "Critiquing Done. Now Generating the final PRD"
                     st.info(status_message)
                     response = llm_model.prompt(
                         f"Given the Feedback from your manager:{critique_response.text()} \n Improve upon your Draft PRD {draft_prd.text()}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED",
@@ -157,7 +157,7 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
                             system=system_prompt_director
                     )
                     st.session_state['history'].append({'role': 'user', 'content': critique_response.text()})
-                    status_message = "Improved PRD Draft Complete. Critiquing Done. Now Generating the final PRD"
+                    status_message = "Critiquing Done. Now Generating the final PRD"
                     st.info(status_message)
                     response = llm_model.prompt(
                         f"Given the Feedback from your manager:{critique_response.text()} \n Improve upon your Draft PRD {draft_prd.text()}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED",
