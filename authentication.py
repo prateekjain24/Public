@@ -7,12 +7,17 @@ def check_authentication(password):
 def authenticate_user():
     if 'authenticated' not in st.session_state:
         st.session_state['authenticated'] = False
-    pwd_input = st.text_input("Password:", type="password")
-    if st.button("Login"):
-        st.session_state['authenticated'] = check_authentication(pwd_input)
-        if not st.session_state['authenticated']:
-            st.error("Incorrect password, please try again.")
-        else:
-            st.session_state['authenticated'] = True
-            st.success("Logged in successfully.")
-            st.rerun()
+
+    # Create a placeholder for the login form
+    login_placeholder = st.sidebar.empty()
+
+    if not st.session_state['authenticated']:
+        with login_placeholder.container():
+            pwd_input = st.text_input("Password:", type="password", key="pwd")
+            if st.button("Login", key="login_button"):
+                st.session_state['authenticated'] = check_authentication(pwd_input)
+                if st.session_state['authenticated']:
+                    # Clear the login placeholder if authenticated
+                    login_placeholder.empty()
+                else:
+                    st.error("Incorrect password, please try again.")
