@@ -3,3 +3,5 @@ openai
 pandas
 numpy
 llm
+groq
+anthropic
