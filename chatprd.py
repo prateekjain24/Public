@@ -4,7 +4,7 @@ from openai import OpenAI
 import llm
 import os
 from authentication import authenticate_user
-from features import create_prd, improve_prd, brainstorm_features, view_history, dynamic_df
+from features import create_prd, improve_prd, brainstorm_features, view_history
 from utils import load_prompts
 from models import build_models
 
