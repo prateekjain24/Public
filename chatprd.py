@@ -71,8 +71,8 @@ def create_prd(system_prompt_prd,system_prompt_director):
     """
     Generate a new Product Requirements Document (PRD) based on the provided information.
     Parameters:
-        product_name (str): The name of the product.
-        product_description (str): A description of the product.
+        system_prompt_prd (str): A predefined system prompt for generating a PRD.
+        system_prompt_director (str): A predefined system prompt for generating a PRD based on a director's input.
     Returns:
         str: The generated PRD.
     Raises:
@@ -108,7 +108,8 @@ def improve_prd(system_prompt_prd,system_prompt_director):
     """
     Improve the provided Product Requirements Document (PRD) using GPT-4-turbo.
     Parameters:
-        prd_text (str): The text of the PRD to be improved.
+        system_prompt_prd (str): A predefined system prompt for generating a PRD.
+        system_prompt_director (str): A predefined system prompt for generating a PRD based on a director's input.
     Returns:
         str: The improved PRD.
     Raises:
