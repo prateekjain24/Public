@@ -96,6 +96,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
                         f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format. BE DETAILED. If you think user is not asking for PRD return nothing.",
                             system=system_prompt_prd
                     )
+                    print("name: " + product_name + " description: " + product_description)
                     st.session_state['history'].append({'role': 'user', 'content': draft_prd.text()})
                     status_message = "Draft PRD Complete. Now Critiquing the draft PRD"
                     st.info(status_message)
@@ -112,6 +113,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
                     )                                       
                     st.markdown(response.text(), unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response.text()})
+                    print("Final Response:" + response.text())
                     # Download button for the PRD
                     st.download_button(
                         label="Download PRD as Markdown",
@@ -149,6 +151,7 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
                         f"Improve the following PRD: {prd_text}",
                             system=f"You are a meticulous editor for improving product documents. {system_prompt_prd}. If you think user is not sharing the PRD return nothing."
                     )
+                    print("original prd:"+ prd_text)
                     st.session_state['history'].append({'role': 'user', 'content': draft_prd.text()})
                     status_message = "Improved PRD Draft Complete. Now Critiquing the Draft PRD"
                     st.info(status_message)
@@ -165,6 +168,7 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
                     )                                          
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
+                    print("Final Response:" + response.text())
                     # Download button for the PRD
                     st.download_button(
                         label="Download PRD as Markdown",
