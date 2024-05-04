@@ -19,12 +19,10 @@ def main():
     system_prompt_director = prompts['system_prompt_director']
     system_prompt_brainstorm = prompts['system_prompt_brainstorm']
     st.title("PM Assisistant")
-    if not st.session_state['authenticated']:
-        pwd_placeholder = st.empty()
-        pwd_input = pwd_placeholder.text_input("Enter your password:", type="password")
-        if st.button("Login"):
-            authenticate_user(pwd_input)
-            pwd_placeholder.empty()  # Clears the password input after button press.
+
+    #Authenticate the user
+    authenticate_user()
+
     if st.session_state['authenticated']:
         st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
