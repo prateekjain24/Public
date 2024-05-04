@@ -111,8 +111,14 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
                             system=system_prompt_prd
                     )                                       
                     st.markdown(response.text(), unsafe_allow_html=True)
-                    #st.text_area("Generated PRD", response, height=300)
                     st.session_state['history'].append({'role': 'user', 'content': response.text()})
+                    # Download button for the PRD
+                    st.download_button(
+                        label="Download PRD as Markdown",
+                        data=response.text(),
+                        file_name="Product_Requirements_Document.md",
+                        mime="text/markdown"
+                    )        
                 except Exception as e:
                     st.error(f"Failed to generate PRD. Please try again later. Error: {str(e)}")
 
@@ -139,13 +145,33 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
         else:
             with st.spinner('Improving PRD...'):
                 try:
-                    response = llm_model.prompt(
+                    draft_prd = llm_model.prompt(
                         f"Improve the following PRD: {prd_text}",
                             system=f"You are a meticulous editor for improving product documents. {system_prompt_prd}"
-                    )                      
+                    )
+                    st.session_state['history'].append({'role': 'user', 'content': draft_prd.text()})
+                    status_message = "Improved PRD Draft Complete. Now Critiquing the Draft PRD"
+                    st.info(status_message)
+                    critique_response = llm_model.prompt(
+                        f"Critique the PRD: {draft_prd.text()}. Only respond in Markdown format. BE DETAILED",
+                            system=system_prompt_director
+                    )
+                    st.session_state['history'].append({'role': 'user', 'content': critique_response.text()})
+                    status_message = "Improved PRD Draft Complete. Critiquing Done. Now Generating the final PRD"
+                    st.info(status_message)
+                    response = llm_model.prompt(
+                        f"Given the Feedback from your manager:{critique_response.text()} \n Improve upon your Draft PRD {draft_prd.text()}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED",
+                            system=system_prompt_prd
+                    )                                          
                     st.markdown(response, unsafe_allow_html=True)
-                    #st.text_area("Improved PRD", response, height=300)
                     st.session_state['history'].append({'role': 'user', 'content': response})
+                    # Download button for the PRD
+                    st.download_button(
+                        label="Download PRD as Markdown",
+                        data=response.text(),
+                        file_name="Product_Requirements_Document.md",
+                        mime="text/markdown"
+                    )                       
                 except Exception as e:
                     st.error(f"Failed to improve PRD. Please try again later. Error: {str(e)}")
 
