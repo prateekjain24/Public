@@ -185,12 +185,9 @@ def brainstorm_features(system_prompt_brainstorm,llm_model):
         # Function to display the chat history
     def display_chat():
         """ Displays each message in the chat history in a text area. """
-        for message in st.session_state['chat_history']:
-            role, content = message.split(": ", 1)
-            if role == 'User':
-                st.text_area('', value=content, height=75, disabled=True, key=message[:15])
-            else:
-                st.text_area('', value=content, height=75, disabled=True, style={"background-color": "#f0f2f6"}, key=message[:15])
+        for idx, message in enumerate(st.session_state['chat_history']):
+            # Using index in key to ensure uniqueness
+            st.text_area('', value=f"{message['role']}: {message['content']}", height=75, disabled=True, key=str(idx))
 
     # Function to add messages to chat history
     def add_message(role, content):
