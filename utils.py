@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import streamlit as st
+import yt_dlp
 
 def load_prompts():
     """
@@ -29,3 +30,26 @@ def load_data(file):
         st.error("Unsupported file format. Please upload a CSV or Excel file.")
         return None
     return df
+
+def download_audio(youtube_url):
+    """Download the medium audio stream of a YouTube video."""
+    ydl_opts = {
+        'format': 'bestaudio',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '128',
+        }],
+        'outtmpl': 'temp_downloaded_audio.%(ext)s',  # Temporary file
+        'quiet': True
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        try:
+            info_dict = ydl.extract_info(youtube_url, download=False)
+            audio_file = ydl.prepare_filename(info_dict).replace("temp_downloaded_audio", "downloaded_audio")
+            ydl.download([youtube_url])
+            return audio_file  # Return the path to the downloaded file
+        except Exception as e:
+            st.error(f"Failed to download audio: {e}")
+            return None
+    pass

@@ -1,6 +1,7 @@
 import streamlit as st
 from models import build_models
-from utils import load_data
+from utils import load_data, download_audio
+from models import transcribe_audio
 
 def create_prd(system_prompt_prd,system_prompt_director, llm_model):
     """
@@ -151,6 +152,27 @@ def view_history():
     pass
 
 def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model):
+    """
+    Generate a tracking plan for a given feature, customer type, additional details, and PRD text.
+
+    Parameters:
+    system_prompt_tracking (str): A predefined system prompt for generating a tracking plan.
+    user_prompt_tracking (str): A predefined user prompt for generating a tracking plan.
+    system_prompt_directorDA (str): A predefined system prompt for generating a tracking plan based on a director's input.
+    llm_model (llm.OpenAI): An initialized LLM model.
+
+    Returns:
+    str: The generated tracking plan in Markdown format.
+
+    Raises:
+    ValueError: If no PRD text is provided.
+    Exception: If there is an error while generating the tracking plan.
+
+    Usage:
+    ```python
+    tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model)
+    ```
+    """
     st.subheader("Generate Tracking Plan")
     feature_name = st.text_input("Feature Name", placeholder="Enter the feature/product name here")
     customer_name = st.selectbox("Choose the customer type", ("Property Agents", "Poperty Seekers"))
@@ -187,7 +209,7 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                         )                                          
                     st.markdown(response.text(), unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
-                    # Download button for the PRD
+                    # Download button for the plan
                     st.download_button(
                         label="Download PRD as Markdown",
                         data=response.text(),
@@ -197,3 +219,42 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                 except Exception as e:
                     st.error(f"Failed to generate tracking plan. Please try again later. Error: {str(e)}")
     pass 
+
+def summarize_yt(system_prompt_yt_planner, prompt_yt_summary,llm_model):
+
+    st.title("YouTube Audio Processor")
+    youtube_url = st.text_input("Enter YouTube URL (not more then 15 mins)")
+
+    if st.button("Process Audio"):
+        if youtube_url:
+            with st.spinner('Downloading and processing audio...'):
+                audio_path = download_audio(youtube_url)
+                if audio_path:
+                    transcription = transcribe_audio(audio_path)
+                    if transcription:
+                        yt_plan = llm_model.prompt(
+                            transcription, system=system_prompt_yt_planner, temperature=0.2 
+                        )
+                        st.session_state['history'].append({'role': 'user', 'content': yt_plan.text()})
+                        status_message = "Planning done..."
+                        st.info(status_message)
+                        yt_execute = llm_model.prompt(
+                            f"Given the Summarisation Plan: {yt_plan.text()}, Summarize the yourtube transcript {transcription}. Only respond in Markdown format. BE VERY DETAILED.",
+                                system=prompt_yt_summary, temperature=0.3
+                        )
+                        st.session_state['history'].append({'role': 'user', 'content': yt_execute.text()})                                      
+                        st.markdown(yt_execute, unsafe_allow_html=True)
+                        # Download button for the summary
+                        st.download_button(
+                            label="Download PRD as Markdown",
+                            data=yt_execute.text(),
+                            file_name="yt_summary.md",
+                            mime="text/markdown"
+                        )    
+                    else:
+                        st.error("Transcription failed.")
+                else:
+                    st.error("Audio download failed.")
+        else:
+            st.warning("Please enter a valid YouTube URL.")
+    pass
