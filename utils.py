@@ -34,21 +34,23 @@ def load_data(file):
 def download_audio(youtube_url):
     """Download the medium audio stream of a YouTube video."""
     ydl_opts = {
-        'format': 'bestaudio',
+        'format': 'bestaudio/best',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
-            'preferredquality': '128',
+            'preferredquality': '192',
         }],
-        'outtmpl': 'temp_downloaded_audio.%(ext)s',  # Temporary file
+        'outtmpl': 'downloaded_audio.%(ext)s',  # Temporary file
         'quiet': True
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
-            info_dict = ydl.extract_info(youtube_url, download=False)
-            audio_file = ydl.prepare_filename(info_dict).replace("temp_downloaded_audio", "downloaded_audio")
+            path = ydl.get_output_path()
+            path
             ydl.download([youtube_url])
-            return audio_file  # Return the path to the downloaded file
+            path = ydl.get_output_path()
+            print(path)
+            return path  # Return the path to the downloaded file
         except Exception as e:
             st.error(f"Failed to download audio: {e}")
             return None

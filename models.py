@@ -32,6 +32,6 @@ def transcribe_audio(audio_path):
         os.remove(audio_path)  # Clean up the audio file after processing
         return transcription['text']
     except Exception as e:
-        os.remove(audio_path)  # Ensure the audio file is cleaned up even on failure
+          # Ensure the audio file is cleaned up even on failure
         st.error(f"Failed to transcribe audio: {e}")
         return None
