@@ -153,7 +153,7 @@ def view_history():
 def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model):
     st.subheader("Generate Tracking Plan")
     feature_name = st.text_input("Feature Name", placeholder="Enter the feature/product name here")
-    customer_name = st.selectbox("Property Agents", "Poperty Seekers")
+    customer_name = st.selectbox("Choose the customer type", ("Property Agents", "Poperty Seekers"))
     other_details = st.text_input("Addition Details", placeholder="Share any details that will be helpful with tracking plan")
     prd_text = st.text_area("Enter your PRD here", placeholder="Paste your PRD here to improve it")
     tracking_button = st.button("Generate Tracking")
