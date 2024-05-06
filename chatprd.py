@@ -4,9 +4,11 @@ from openai import OpenAI
 import llm
 import os
 from authentication import authenticate_user
-from features import create_prd, improve_prd, brainstorm_features, view_history
+from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan
 from utils import load_prompts
 from models import build_models
+
+#load_dotenv()
 
 # Using Streamlit's session state to store temporary memory
 if 'history' not in st.session_state:
@@ -18,12 +20,15 @@ def main():
     system_prompt_prd = prompts['system_prompt_prd']
     system_prompt_director = prompts['system_prompt_director']
     system_prompt_brainstorm = prompts['system_prompt_brainstorm']
+    system_prompt_tracking = prompts['system_prompt_tracking']
+    user_prompt_tracking = prompts['prompt_tracking_plan']
+    system_prompt_directorDA = prompts['system_prompt_directorDA']
     #Authenticate the user
     authenticate_user()
     if st.session_state['authenticated']:
         st.title("PM Assisistant")
         st.sidebar.title("Select the Task:")
-        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "View History"))
+        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","View History"))
 
         if option == "Create PRD":
             create_prd(system_prompt_prd,system_prompt_director, quality_llm)
@@ -31,6 +36,8 @@ def main():
             improve_prd(system_prompt_prd,system_prompt_director,quality_llm)
         elif option == "Brainstorm Features":
             brainstorm_features(system_prompt_brainstorm,quality_llm)
+        elif option == "Tracking Plan":
+            tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, quality_llm)
         elif option == "View History":
             view_history()
 
