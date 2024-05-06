@@ -169,21 +169,21 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                     user_prompt = user_prompt.replace("{details}", other_details)
                     user_prompt = user_prompt.replace("{prd}", prd_text)
                     draft_plan = llm_model.prompt(
-                        user_prompt, system=system_prompt_tracking, temprature = 0.2 
+                        user_prompt, system=system_prompt_tracking, temperature=0.2 
                     )
                     st.session_state['history'].append({'role': 'user', 'content': draft_plan.text()})
                     status_message = "Draft tracking Done. Reviewing the plan..."
                     st.info(status_message)
                     critique_response = llm_model.prompt(
                         f"Critique the Tracking Plan: {draft_plan.text()}. Only respond in Markdown format. BE DETAILED. If you think user is not asking for tracking plan return nothing.\n Context: ### PRD \n {prd_text} \n ### Feature Name \n {feature_name} \n ### Additional Details \n {other_details} ",
-                            system=system_prompt_directorDA, temprature = 0.3
+                            system=system_prompt_directorDA, temperature=0.3
                     )
                     st.session_state['history'].append({'role': 'user', 'content': critique_response.text()})
                     status_message = "Making final adjustments.."
                     st.info(status_message)
                     response = llm_model.prompt(
                         f"Given the Feedback from your manager:{critique_response.text()} \n Improve upon your draft tracking plan {draft_plan.text()}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for tracking plan return nothing.",
-                            system=system_prompt_tracking, temprature=0.1                    
+                            system=system_prompt_tracking, temperature=0.1                    
                         )                                          
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
