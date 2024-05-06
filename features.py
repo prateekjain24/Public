@@ -185,7 +185,7 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                         f"Given the Feedback from your manager:{critique_response.text()} \n Improve upon your draft tracking plan {draft_plan.text()}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for tracking plan return nothing.",
                             system=system_prompt_tracking, temperature=0.1                    
                         )                                          
-                    st.markdown(response, unsafe_allow_html=True)
+                    st.markdown(response.text(), unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
                     # Download button for the PRD
                     st.download_button(
