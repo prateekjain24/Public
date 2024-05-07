@@ -30,7 +30,7 @@ def main():
     if st.session_state['authenticated']:
         st.title("PM Assisistant")
         st.sidebar.title("Select the Task:")
-        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","View History","Summarize Youtube"))
+        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","View History"))
 
         if option == "Create PRD":
             create_prd(system_prompt_prd,system_prompt_director, quality_llm)
