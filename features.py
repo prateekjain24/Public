@@ -115,6 +115,19 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
     pass               
 
 def brainstorm_features(system_prompt_brainstorm,llm_model):
+    """
+    This function allows the user to interact with an AI model to brainstorm ideas on a given topic.
+    Parameters:
+    system_prompt_brainstorm (str): A predefined system prompt for generating a response.
+    llm_model (llm.OpenAI): An initialized LLM model.
+    Returns:
+    None
+    Usage:
+    ```python
+    brainstorm_features(system_prompt_brainstorm, llm_model)
+    ```
+    The function initializes a chat history if it doesn't already exist. It then displays chat messages from the history on app rerun. The function reacts to user input by displaying the user message in a chat message container, adding the user message to the chat history, and generating an assistant response using the provided LLM model. The assistant response is then displayed in a chat message container and added to the chat history.
+    """
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -143,6 +156,11 @@ def brainstorm_features(system_prompt_brainstorm,llm_model):
     pass    
 
 def view_history():
+    """
+    View the history of all the interactions with the assistant.
+    Returns:
+        None
+    """
     st.subheader("View History")
     if st.session_state['history']:
         for item in st.session_state['history']:
