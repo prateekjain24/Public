@@ -13,9 +13,9 @@ def build_models():
     """
     gpt4_model = llm.get_model("gpt-4-turbo")
     gpt4_model.key = os.getenv("OPENAI_API_KEY")
-    
-    groq_model = llm.get_model("groq-llama3-70b")
-    groq_model.key = os.getenv("GROQ_API_KEY")
+    ## Temporary change to gpt4 till eroor is resolved
+    groq_model = llm.get_model("gpt-4-turbo")
+    groq_model.key = os.getenv("OPENAI_API_KEY")
 
     return groq_model, gpt4_model
 
