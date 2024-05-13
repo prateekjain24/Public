@@ -1,5 +1,9 @@
+pydantic
+dotenv
 openai
 pandas
 numpy
 llm
 groq
+uvicorn
+fastapi
