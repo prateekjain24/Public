@@ -11,13 +11,13 @@ def build_models():
     Raises:
         ValueError: If the OPENAI_API_KEY environment variable is not set.
     """
-    gpt3_model = llm.get_model("gpt-3.5-turbo")
-    gpt3_model.key = os.getenv("OPENAI_API_KEY")
-
     gpt4_model = llm.get_model("gpt-4-turbo")
     gpt4_model.key = os.getenv("OPENAI_API_KEY")
+    
+    groq_model = llm.get_model("groq-llama3-70b")
+    groq_model.key = os.getenv("GROQ_API_KEY")
 
-    return gpt3_model, gpt4_model
+    return groq_model, gpt4_model
 
 def transcribe_audio(audio_path):
     """Transcribe the downloaded audio file using OpenAI's Whisper model."""

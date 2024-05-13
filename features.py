@@ -3,7 +3,7 @@ from models import build_models
 from utils import load_data, download_audio
 from models import transcribe_audio
 
-def create_prd(system_prompt_prd,system_prompt_director, llm_model):
+def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_model):
     """
     Generate a new Product Requirements Document (PRD) based on the provided information.
     Parameters:
@@ -28,7 +28,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model):
         else:
             with st.spinner(status_message):
                 try:
-                    draft_prd = llm_model.prompt(
+                    draft_prd = fast_llm_model.prompt(
                         f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format. BE DETAILED. If you think user is not asking for PRD return nothing.",
                             system=system_prompt_prd
                     )

@@ -33,7 +33,7 @@ def main():
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","View History"))
 
         if option == "Create PRD":
-            create_prd(system_prompt_prd,system_prompt_director, quality_llm)
+            create_prd(system_prompt_prd,system_prompt_director, quality_llm, fast_llm)
         elif option == "Improve PRD":
             improve_prd(system_prompt_prd,system_prompt_director,quality_llm)
         elif option == "Brainstorm Features":
