@@ -11,10 +11,10 @@ def build_models():
     Raises:
         ValueError: If the OPENAI_API_KEY environment variable is not set.
     """
-    gpt4_model = llm.get_model("gpt-4-turbo")
+    gpt4_model = llm.get_model("gpt-4o")
     gpt4_model.key = os.getenv("OPENAI_API_KEY")
     ## Temporary change to gpt4 till eroor is resolved
-    groq_model = llm.get_model("gpt-4-turbo")
+    groq_model = llm.get_model("gpt-4o")
     groq_model.key = os.getenv("OPENAI_API_KEY")
 
     return groq_model, gpt4_model

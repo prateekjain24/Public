@@ -4,7 +4,7 @@ from fastapi import HTTPException
 def call_openai_api(prompt, model, max_tokens, temperature, system_instructions):
     client = OpenAI()
     if 'gpt4' in model or 'GPT4' in model or 'gpt-4' in model or 'GPT-4' in model:
-        model = "gpt-4-turbo"
+        model = "gpt-4o"
     else:
         model = "gpt-3.5-turbo"
 

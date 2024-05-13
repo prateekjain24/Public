@@ -1,5 +1,5 @@
 pydantic
-dotenv
+python-dotenv
 openai
 pandas
 numpy
