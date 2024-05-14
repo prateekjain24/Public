@@ -78,9 +78,6 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
     # Function to create a tracking plan
     ...
 
-# Uncomment and complete if YouTube audio processing is needed
-# def summarize_yt(system_prompt_yt_planner, prompt_yt_summary, llm_model):
-#     ...
 ```
 
 ## Contributing
