@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 # import llm
 import os
 from authentication import authenticate_user
@@ -8,7 +8,7 @@ from features import create_prd, improve_prd, brainstorm_features, view_history,
 from utils import load_prompts
 from models import build_models
 
-load_dotenv()
+# load_dotenv()
 
 # Using Streamlit's session state to store temporary memory
 if 'history' not in st.session_state:
