@@ -7,4 +7,3 @@ groq
 anthropic
 ffmpeg
 yt-dlp
-llm-groq
