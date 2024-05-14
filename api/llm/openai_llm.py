@@ -30,7 +30,7 @@ class OpenAIWrapper:
         """Sets the system prompt."""
         self._system_prompt = value
     
-    def generate_text(self, prompt, max_tokens=100, temperature=0.7, **kwargs):
+    def generate_text(self, prompt, max_tokens=4000, temperature=0.7, **kwargs):
         """
         Generate text using the specified model.
 

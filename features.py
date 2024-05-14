@@ -47,12 +47,12 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_mod
                         draft_prd, input_tokens, output_tokens = llm_model.generate_text(
                             prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your Draft PRD {draft_prd}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED. If you think user is not asking for PRD return nothing."
                         )
-                    st.markdown(draft_prd.text(), unsafe_allow_html=True)
+                    st.markdown(draft_prd, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': draft_prd})
                     # Download button for the PRD
                     st.download_button(
                         label="Download PRD as Markdown",
-                        data=draft_prd.text(),
+                        data=draft_prd,
                         file_name="Product_Requirements_Document.md",
                         mime="text/markdown"
                     )
@@ -106,7 +106,7 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
                     # Download button for the PRD
                     st.download_button(
                         label="Download PRD as Markdown",
-                        data=response.text(),
+                        data=response,
                         file_name="Product_Requirements_Document.md",
                         mime="text/markdown"
                     )                       
@@ -228,12 +228,12 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                         prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for tracking plan return nothing.",
                         temperature=0.1                    
                     )                                          
-                    st.markdown(response.text(), unsafe_allow_html=True)
+                    st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
                     # Download button for the plan
                     st.download_button(
                         label="Download PRD as Markdown",
-                        data=response.text(),
+                        data=response,
                         file_name="tracking_plan.md",
                         mime="text/markdown"
                     )                       

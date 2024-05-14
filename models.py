@@ -1,4 +1,5 @@
-import llm
+from api.llm.openai_llm import OpenAIWrapper
+from api.llm.groq_llm import GroqWrapper
 import os
 import openai
 import streamlit as st
@@ -11,11 +12,8 @@ def build_models():
     Raises:
         ValueError: If the OPENAI_API_KEY environment variable is not set.
     """
-    gpt4_model = llm.get_model("gpt-4o")
-    gpt4_model.key = os.getenv("OPENAI_API_KEY")
-    ## Temporary change to gpt4 till eroor is resolved
-    groq_model = llm.get_model("gpt-4o")
-    groq_model.key = os.getenv("OPENAI_API_KEY")
+    gpt4_model = OpenAIWrapper(model ="gpt-4o")
+    groq_model = GroqWrapper(model = "llama3-70b-8192")
 
     return groq_model, gpt4_model
 
