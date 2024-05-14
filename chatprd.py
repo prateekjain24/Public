@@ -40,8 +40,8 @@ def main():
             brainstorm_features(system_prompt_brainstorm,quality_llm)
         elif option == "Tracking Plan":
             tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, quality_llm)
-        elif option == "Summarize Youtube":
-            summarize_yt(system_prompt_yt_planner,prompt_yt_summary, quality_llm)
+        # elif option == "Summarize Youtube":
+        #     summarize_yt(system_prompt_yt_planner,prompt_yt_summary, quality_llm)
         elif option == "View History":
             view_history()
 

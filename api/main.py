@@ -2,9 +2,10 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import uvicorn
-from llm.openai_llm import call_openai_api
-from llm.groq_llm import call_groq_api
+from llm.openai_llm import OpenAIWrapper
+from llm.groq_llm import GroqWrapper
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 app = FastAPI()
@@ -29,20 +30,18 @@ class GenerateTextResponse(BaseModel):
 async def generate_text(request: GenerateTextRequest):
     try:
         if request.provider == "openai":
-            generated_text, input_tokens, output_tokens = call_openai_api(
+            client = OpenAIWrapper(model=request.model, system_prompt=request.system_instructions)
+            generated_text, input_tokens, output_tokens = client.generate_text(
                 prompt=request.prompt,
-                model=request.model,
                 max_tokens=request.max_tokens,
                 temperature=request.temperature,
-                system_instructions=request.system_instructions
             )
         else:
-            generated_text, input_tokens, output_tokens = call_groq_api(
+            client = GroqWrapper(model=request.model,system_prompt=request.system_instructions)
+            generated_text, input_tokens, output_tokens = client.generate_text(
                 prompt=request.prompt,
-                model=request.model,
                 max_tokens=request.max_tokens,
                 temperature=request.temperature,
-                system_instructions=request.system_instructions
             )
         result = GenerateTextResponse(
             generated_text=generated_text,
