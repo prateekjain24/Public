@@ -1,6 +1,4 @@
 import streamlit as st
-from utils import download_audio
-from models import transcribe_audio
 
 def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_model):
     """
