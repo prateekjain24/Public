@@ -1,6 +1,4 @@
-from openai import OpenAI
 import openai
-from fastapi import HTTPException
 import os
 
 class OpenAIWrapper:
