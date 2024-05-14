@@ -232,7 +232,7 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                     st.session_state['history'].append({'role': 'user', 'content': response})
                     # Download button for the plan
                     st.download_button(
-                        label="Download PRD as Markdown",
+                        label="Download Tracking Plan as Markdown",
                         data=response,
                         file_name="tracking_plan.md",
                         mime="text/markdown"
@@ -240,6 +240,52 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                 except Exception as e:
                     st.error(f"Failed to generate tracking plan. Please try again later. Error: {str(e)}")
     pass 
+
+def gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm_model, llm_model):
+    st.subheader("Generate GTM Plan")
+    prd_text = st.text_area("Enter your PRD here", placeholder="Paste your PRD here to generate GTM plan")
+    other_details = st.text_area("Addition Details", placeholder="Share any details that will be helpful with GTM planning")
+    tracking_button = st.button("Generate GTM Plan")
+
+    if tracking_button:
+        if not prd_text:
+            st.warning("Please enter a all the details")
+        else:
+            with st.spinner('Generating Plan...'):
+                try:
+                    user_prompt = f"Genearte the GTM Plan for: \n ## Product Requirements Decument \n {prd_text} \n ## Other Details \n {other_details} \n RESPOND in Markdown Only."
+                    llm_model.system_prompt = system_prompt_GTM
+                    draft_plan, input_tokens, output_tokens = llm_model.generate_text(
+                        prompt = user_prompt, temperature=0.2 
+                    )
+                    st.session_state['history'].append({'role': 'user', 'content': draft_plan})
+                    status_message = "Draft GTM Done. Reviewing the plan..."
+                    st.info(status_message)
+                    llm_model.system_prompt = system_prompt_GTM_critique
+                    critique_response, input_tokens, output_tokens = llm_model.generate_text(
+                        prompt = f"Critique the GTM Plan: {draft_plan}. Only respond in Markdown format. BE DETAILED. If you think user is not asking for GTM plan return nothing.\n Context: ### PRD \n {prd_text} \n ### Additional Details \n {other_details} ",
+                        temperature=0.3
+                    )
+                    st.session_state['history'].append({'role': 'user', 'content': critique_response})
+                    status_message = "Making final adjustments.."
+                    st.info(status_message)
+                    llm_model.system_prompt = system_prompt_GTM
+                    response, input_tokens, output_tokens = llm_model.generate_text(
+                        prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for GTM plan return nothing.",
+                        temperature=0.1                    
+                    )                                          
+                    st.markdown(response, unsafe_allow_html=True)
+                    st.session_state['history'].append({'role': 'user', 'content': response})
+                    # Download button for the plan
+                    st.download_button(
+                        label="Download GTM Plan as Markdown",
+                        data=response,
+                        file_name="gtm_plan.md",
+                        mime="text/markdown"
+                    )                       
+                except Exception as e:
+                    st.error(f"Failed to generate gtm plan. Please try again later. Error: {str(e)}")
+    pass
 
 # def summarize_yt(system_prompt_yt_planner, prompt_yt_summary,llm_model):
 
