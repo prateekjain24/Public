@@ -28,7 +28,6 @@ def main():
     #Authenticate the user
     authenticate_user()
     if st.session_state['authenticated']:
-        st.title("PM Assisistant")
         st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","View History"))
 
