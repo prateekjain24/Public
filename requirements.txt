@@ -9,5 +9,4 @@ anthropic
 ffmpeg
 yt-dlp
 supabase
-jwt
 streamlit_cookies_manager
