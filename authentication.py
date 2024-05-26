@@ -98,7 +98,8 @@ def auth_screen(supabase):
             st.session_state['user'] = {"email": user_data["email"]}
         else:
             st.session_state['logged_in'] = False
-            cookies.delete("auth_token")
+            cookies["auth_token"] = ""
+            cookies.save()
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
