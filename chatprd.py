@@ -3,7 +3,7 @@ from openai import OpenAI
 #from dotenv import load_dotenv
 # import llm
 import os
-from authentication import authenticate_user #, auth_screen 
+from authentication import authenticate #, auth_screen 
 from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan, gtm_planner
 from utils import load_prompts
 from models import build_models
@@ -37,7 +37,7 @@ def main():
     system_prompt_GTM = prompts['system_prompt_GTM']
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
     #Authenticate the user
-    authenticate_user()
+    authenticate()
     #auth_screen(supabase)
     if st.session_state['authenticated']:
     #if st.session_state['logged_in']:

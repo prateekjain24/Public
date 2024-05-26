@@ -9,7 +9,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 def check_authentication(password):
     return password == os.getenv('PASSWORD')
 
-def authenticate_user():
+def authenticate():
     if 'authenticated' not in st.session_state:
         st.session_state['authenticated'] = False
 
