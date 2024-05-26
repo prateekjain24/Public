@@ -4,6 +4,10 @@ pandas
 numpy
 llm
 groq
+Pillow
 anthropic
 ffmpeg
 yt-dlp
+supabase
+jwt
+streamlit_cookies_manager

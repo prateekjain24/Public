@@ -2,6 +2,9 @@ import json
 import pandas as pd
 import streamlit as st
 import yt_dlp
+from PIL import Image
+import base64
+from io import BytesIO
 
 def load_prompts():
     """
@@ -54,4 +57,11 @@ def download_audio(youtube_url):
         except Exception as e:
             st.error(f"Failed to download audio: {e}")
             return None
+    pass
+
+def encode_image(image, format):
+    buffered = BytesIO()
+    image.save(buffered, format=format)
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return img_str
     pass
