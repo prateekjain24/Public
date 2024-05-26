@@ -3,7 +3,7 @@ from openai import OpenAI
 #from dotenv import load_dotenv
 # import llm
 import os
-from authentication import authenticate_user, auth_screen 
+from authentication import authenticate_user #, auth_screen 
 from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan, gtm_planner
 from utils import load_prompts
 from models import build_models
@@ -39,8 +39,8 @@ def main():
     #Authenticate the user
     authenticate_user()
     #auth_screen(supabase)
-    #if st.session_state['authenticated']:
-    if st.session_state['logged_in']:
+    if st.session_state['authenticated']:
+    #if st.session_state['logged_in']:
         st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
 
