@@ -37,8 +37,8 @@ def main():
     system_prompt_GTM = prompts['system_prompt_GTM']
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
     #Authenticate the user
-    #authenticate_user()
-    auth_screen(supabase)
+    authenticate_user()
+    #auth_screen(supabase)
     #if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         st.sidebar.title("Select the Task:")
