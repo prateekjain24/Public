@@ -108,7 +108,8 @@ def auth_screen(supabase):
         if st.button("Logout"):
             st.session_state['logged_in'] = False
             st.session_state.pop('user', None)
-            cookies.delete("auth_token")
+            cookies["auth_token"] = ""
+            cookies.save()
             st.experimental_rerun()
     else:
         auth_mode = st.radio("Select mode", ["Login", "Register", "Reset Password"])
