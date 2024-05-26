@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-# from dotenv import load_dotenv
+#from dotenv import load_dotenv
 # import llm
 import os
 from authentication import authenticate_user, auth_screen 
@@ -14,7 +14,7 @@ import datetime
 from streamlit_cookies_manager import EncryptedCookieManager
 
 
-# load_dotenv()
+#load_dotenv()
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
