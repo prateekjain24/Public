@@ -3,7 +3,8 @@ import os
 import re
 import jwt
 import datetime
-from streamlit_cookies_manager import EncryptedCookieManager
+#from streamlit_cookies_manager import EncryptedCookieManager
+import extra_streamlit_components as stx
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 def check_authentication(password):
@@ -54,7 +55,7 @@ def authenticate_user(email, password, supabase, cookies):
             user_email = response.user.email  # Accessing user email correctly
             token = generate_jwt(user_email)
             expiration_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=15)
-            cookies["auth_token"] = token
+            cookies.set("auth_token",token, "set", "/", expiration_date)
             cookies.save()  # Ensure to save cookies after setting them
             st.session_state['logged_in'] = True
             st.session_state['user'] = response.user
@@ -82,36 +83,32 @@ def register_user(email, password, supabase):
     except Exception as e:
         st.error(f"Registration failed: {e}")
 
-def auth_screen(supabase):
-    cookies = EncryptedCookieManager(
-        prefix="myapp_",  # prefix for cookie names to avoid collision
-        password=SECRET_KEY,  # password for cookie encryption
-    )
-    if not cookies.ready():
-        st.stop()
+def get_manager():
+    return stx.CookieManager()
 
-    if "auth_token" in cookies:
-        token = cookies.get("auth_token")
+def auth_screen(supabase):
+    cookies = get_manager()
+
+    if cookies.get(cookie="auth_token"):
+        token = cookies.get(cookie="auth_token")
         user_data = verify_jwt(token)
         if user_data:
             st.session_state['logged_in'] = True
             st.session_state['user'] = {"email": user_data["email"]}
         else:
             st.session_state['logged_in'] = False
-            cookies["auth_token"] = ""
-            cookies.save()
+            cookies.delete("auth_token")
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
     if st.session_state['logged_in']:
-        st.success(f"Welcome {st.session_state['user']['email']}")
-        if st.button("Logout"):
+        st.sidebar.success(f"Welcome {st.session_state['user']['email']}")
+        if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
             st.session_state.pop('user', None)
-            cookies["auth_token"] = ""
-            cookies.save()
-            st.experimental_rerun()
+            cookies.delete("auth_token")
+            st.rerun()
     else:
         auth_mode = st.radio("Select mode", ["Login", "Register", "Reset Password"])
         st.markdown(f'## <div>{"Welcome back!" if auth_mode == "Login" else "Create an account"}</div>', unsafe_allow_html=True)

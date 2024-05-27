@@ -11,3 +11,4 @@ yt-dlp
 supabase
 streamlit_cookies_manager
 PyJWT
+extra-streamlit-components

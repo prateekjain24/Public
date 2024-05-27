@@ -14,9 +14,9 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_mod
     """
 
     st.subheader("Create New PRD")
-    product_name = st.text_input("Product Name", placeholder="Enter the product name here")
-    product_description = st.text_area("Product Description", placeholder="Describe the product here. Use bullet points where possible")
-    generate_button = st.button("Generate PRD")
+    product_name = st.text_input("#### Product Name", placeholder="Enter the product name here")
+    product_description = st.text_area("#### Product Description", placeholder="Describe the product here. Use bullet points where possible", height = 400)
+    generate_button = st.button("Generate PRD", type="primary")
     status_message = "PRD generation in progress..."
 
     if generate_button:
@@ -72,8 +72,8 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
         Exception: If there is an error while improving the PRD.
     """
     st.subheader("Improve Current PRD")
-    prd_text = st.text_area("Enter your PRD here", placeholder="Paste your PRD here to improve it")
-    improve_button = st.button("Improve PRD")
+    prd_text = st.text_area("#### Enter your PRD here", placeholder="Paste your PRD here to improve it", height = 400)
+    improve_button = st.button("Improve PRD", type="primary")
 
     if improve_button:
         if not prd_text:
@@ -190,11 +190,11 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
     ```
     """
     st.subheader("Generate Tracking Plan")
-    feature_name = st.text_input("Feature Name", placeholder="Enter the feature/product name here")
-    customer_name = st.selectbox("Choose the customer type", ("Property Agents", "Poperty Seekers"))
-    other_details = st.text_input("Addition Details", placeholder="Share any details that will be helpful with tracking plan")
-    prd_text = st.text_area("Enter your PRD here", placeholder="Paste your PRD here to improve it")
-    tracking_button = st.button("Generate Tracking")
+    feature_name = st.text_input("#### Feature Name", placeholder="Enter the feature/product name here")
+    customer_name = st.selectbox("#### Choose the customer type", ("Property Agents", "Poperty Seekers"))
+    other_details = st.text_input("#### Addition Details", placeholder="Share any details that will be helpful with tracking plan")
+    prd_text = st.text_area("#### Enter your PRD here", placeholder="Paste your PRD here to improve it", height = 400)
+    tracking_button = st.button("Generate Tracking", type="primary")
 
     if tracking_button:
         if not prd_text:
@@ -241,9 +241,9 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
 
 def gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm_model, llm_model):
     st.subheader("Generate GTM Plan")
-    prd_text = st.text_area("Enter your PRD here", placeholder="Paste your PRD here to generate GTM plan")
-    other_details = st.text_area("Addition Details", placeholder="Share any details that will be helpful with GTM planning")
-    tracking_button = st.button("Generate GTM Plan")
+    prd_text = st.text_area("#### Enter your PRD here", placeholder="Paste your PRD here to generate GTM plan", height = 400)
+    other_details = st.text_area("#### Addition Details", placeholder="Share any details that will be helpful with GTM planning", height = 200)
+    tracking_button = st.button("Generate GTM Plan", type="primary")
 
     if tracking_button:
         if not prd_text:
