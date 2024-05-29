@@ -43,7 +43,7 @@ def main():
     # authenticate()
     st.set_page_config(
     page_title="PM Toolkit",
-    page_icon="🧊",
+    page_icon="🥊",
     layout="wide",
     )
     auth_screen(supabase)
