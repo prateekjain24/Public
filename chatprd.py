@@ -42,6 +42,7 @@ def main():
     # Authenticate the user
     # authenticate()
     auth_screen(supabase)
+    st.title("PM Toolkit")
     # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         st.sidebar.title("Select the Task:")
