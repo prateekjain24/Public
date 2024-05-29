@@ -1,6 +1,10 @@
 import streamlit as st
+import os
+from storage import create_data, create_record, read_records, delete_record
 
-def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_model):
+prd_table = os.environ.get('SUPABASE_TABLE')
+
+def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_model,supabase):
     """
     Generate a new Product Requirements Document (PRD) based on the provided information.
     Parameters:
@@ -47,6 +51,11 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_mod
                         )
                     st.markdown(draft_prd, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': draft_prd})
+                    data = create_data(st.session_state['user']['email'],product_name, product_description, draft_prd, True)
+                    try: 
+                        create_record(prd_table,data,supabase)
+                    except Exception as e:
+                        st.error(f"Failed to save PRD to database. Error: {str(e)}")
                     # Download button for the PRD
                     st.download_button(
                         label="Download PRD as Markdown",
@@ -58,7 +67,7 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_mod
                     st.error(f"Failed to generate PRD. Please try again later. Error: {str(e)}")
     pass
 
-def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
+def improve_prd(system_prompt_prd,system_prompt_director,llm_model, supabase):
     """
     Improve the provided Product Requirements Document (PRD) using GPT-4-turbo.
     Parameters:
@@ -101,6 +110,11 @@ def improve_prd(system_prompt_prd,system_prompt_director,llm_model):
                     )                                          
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
+                    data = create_data(st.session_state['user']['email'],"Imporve PRD", prd_text, response, False)
+                    try:
+                        create_record(prd_table,data,supabase)
+                    except Exception as e:
+                        st.error(f"Failed to save PRD to database. Error: {str(e)}")
                     # Download button for the PRD
                     st.download_button(
                         label="Download PRD as Markdown",

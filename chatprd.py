@@ -33,17 +33,17 @@ def main():
     system_prompt_GTM = prompts['system_prompt_GTM']
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
     #Authenticate the user
-    authenticate()
-    #auth_screen(supabase)
-    if st.session_state['authenticated']:
-    #if st.session_state['logged_in']:
+    #authenticate()
+    auth_screen(supabase)
+    #if st.session_state['authenticated']:
+    if st.session_state['logged_in']:
         st.sidebar.title("Select the Task:")
         option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
 
         if option == "Create PRD":
-            create_prd(system_prompt_prd,system_prompt_director, quality_llm, fast_llm)
+            create_prd(system_prompt_prd,system_prompt_director, quality_llm, fast_llm,supabase)
         elif option == "Improve PRD":
-            improve_prd(system_prompt_prd,system_prompt_director,quality_llm)
+            improve_prd(system_prompt_prd,system_prompt_director,quality_llm,supabase)
         elif option == "Brainstorm Features":
             brainstorm_features(system_prompt_brainstorm,quality_llm)
         elif option == "Tracking Plan":

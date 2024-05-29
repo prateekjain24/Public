@@ -3,10 +3,12 @@ import os
 import re
 import jwt
 import datetime
-#from streamlit_cookies_manager import EncryptedCookieManager
-import extra_streamlit_components as stx
+from streamlit_cookies_controller import CookieController
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
+controller = CookieController()
+
+
 def check_authentication(password):
     return password == os.getenv('PASSWORD')
 
@@ -48,15 +50,14 @@ def verify_jwt(token):
     except jwt.InvalidTokenError:
         return None
 
-def authenticate_user(email, password, supabase, cookies):
+def authenticate_user(email, password, supabase):
     try:
         response = supabase.auth.sign_in_with_password({"email": email, "password": password})
         if response.user:
             user_email = response.user.email  # Accessing user email correctly
             token = generate_jwt(user_email)
             expiration_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=15)
-            cookies.set("auth_token",token, "set", "/", expiration_date)
-            cookies.save()  # Ensure to save cookies after setting them
+            controller.set('prd_prateek', token,"/",expiration_date)
             st.session_state['logged_in'] = True
             st.session_state['user'] = response.user
             st.success(f"Welcome {user_email}")
@@ -83,21 +84,18 @@ def register_user(email, password, supabase):
     except Exception as e:
         st.error(f"Registration failed: {e}")
 
-def get_manager():
-    return stx.CookieManager()
 
 def auth_screen(supabase):
-    cookies = get_manager()
 
-    if cookies.get(cookie="auth_token"):
-        token = cookies.get(cookie="auth_token")
+    if controller.get('prd_prateek'):
+        token = controller.get('prd_prateek')
         user_data = verify_jwt(token)
         if user_data:
             st.session_state['logged_in'] = True
             st.session_state['user'] = {"email": user_data["email"]}
         else:
             st.session_state['logged_in'] = False
-            cookies.delete("auth_token")
+            controller.remove('prd_prateek')
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
@@ -107,12 +105,11 @@ def auth_screen(supabase):
         if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
             st.session_state.pop('user', None)
-            cookies.delete("auth_token")
+            controller.remove('prd_prateek')
             st.rerun()
     else:
-        auth_mode = st.radio("Select mode", ["Login", "Register", "Reset Password"])
+        auth_mode = st.radio("Select mode", ["Login", "Register"])
         st.markdown(f'## <div>{"Welcome back!" if auth_mode == "Login" else "Create an account"}</div>', unsafe_allow_html=True)
-        st.markdown('#### <div>We\'re so excited to see you again!</div>', unsafe_allow_html=True)
         
         email = st.text_input("Email", key="email", label_visibility="collapsed", placeholder="Email", help="Enter your email address")
         password = st.text_input("Password", key="password", label_visibility="collapsed", placeholder="Password", type="password", help="Enter your password")
@@ -120,7 +117,7 @@ def auth_screen(supabase):
         if auth_mode == "Login":
             if st.button("Log In", key="login"):
                 if is_valid_email(email):
-                    authenticate_user(email, password, supabase, cookies)
+                    authenticate_user(email, password, supabase)
                 else:
                     st.error("Please enter a valid email address")
             if st.button("Forgot Password?", key="forgot_password"):
