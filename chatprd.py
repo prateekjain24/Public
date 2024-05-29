@@ -20,6 +20,13 @@ if 'history' not in st.session_state:
     st.session_state['history'] = []
 
 def main():
+    """
+    Main function that serves as the entry point of the program.
+    
+    This function loads prompts, builds models, and presents a menu of options to the user based on their selection.
+    The user can choose to create a PRD, improve a PRD, brainstorm features, create a tracking plan, create a GTM plan, or view history.
+    Each option calls a specific function to perform the corresponding task.
+    """
     prompts = load_prompts()
     fast_llm, quality_llm = build_models()
     system_prompt_prd = prompts['system_prompt_prd']
@@ -32,14 +39,13 @@ def main():
     prompt_yt_summary = prompts['prompt_yt_summary']
     system_prompt_GTM = prompts['system_prompt_GTM']
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
-    #Authenticate the user
-    #authenticate()
+    # Authenticate the user
+    # authenticate()
     auth_screen(supabase)
-    #if st.session_state['authenticated']:
+    # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         st.sidebar.title("Select the Task:")
-        option = st.sidebar.selectbox("Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
-
+        option = st.sidebar.selectbox("### Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
         if option == "Create PRD":
             create_prd(system_prompt_prd,system_prompt_director, quality_llm, fast_llm,supabase)
         elif option == "Improve PRD":

@@ -29,8 +29,8 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_mod
         else:
             with st.spinner(status_message):
                 try:
-                    fast_llm_model.system_prompt = system_prompt_prd
-                    draft_prd, input_tokens, output_tokens = fast_llm_model.generate_text(
+                    llm_model.system_prompt = system_prompt_prd
+                    draft_prd, input_tokens, output_tokens = llm_model.generate_text(
                         prompt = f"Generate a PRD for a product named {product_name} with the following description: {product_description}. Only respond with the PRD and in Markdown format. BE DETAILED. If you think user is not asking for PRD return nothing."
                     )
                     critique_rounds = 2  # Set the number of critique rounds
@@ -45,10 +45,16 @@ def create_prd(system_prompt_prd,system_prompt_director, llm_model, fast_llm_mod
                         st.session_state['history'].append({'role': 'user', 'content': critique_response})
                         status_message = "Making adjustments.."
                         st.info(status_message)
-                        llm_model.system_prompt = system_prompt_prd
-                        draft_prd, input_tokens, output_tokens = llm_model.generate_text(
-                            prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your Draft PRD {draft_prd}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED. If you think user is not asking for PRD return nothing."
-                        )
+                        if round != 0:
+                            llm_model.system_prompt = system_prompt_prd
+                            draft_prd, input_tokens, output_tokens = llm_model.generate_text(
+                                prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your Draft PRD {draft_prd}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED. If you think user is not asking for PRD return nothing."
+                            )
+                        else:
+                            fast_llm_model.system_prompt = system_prompt_prd
+                            draft_prd, input_tokens, output_tokens = fast_llm_model.generate_text(
+                                prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your Draft PRD {draft_prd}. \n Only respond with the PRD and in Markdown format. BE VERY DETAILED. If you think user is not asking for PRD return nothing."
+                            )
                     st.markdown(draft_prd, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': draft_prd})
                     data = create_data(st.session_state['user']['email'],product_name, product_description, draft_prd, True)
@@ -253,29 +259,41 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                     st.error(f"Failed to generate tracking plan. Please try again later. Error: {str(e)}")
     pass 
 
-def gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm_model, llm_model):
+def gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm_model, llm_model):
+    """
+    Generate GTM (Go-To-Market) Plan.
+
+    Args:
+        system_prompt_GTM (str): The system prompt for generating the initial GTM plan.
+        system_prompt_GTM_critique (str): The system prompt for critiquing the GTM plan.
+        fast_llm_model: The fast language model used for generating text.
+        llm_model: The language model used for generating text.
+
+    Returns:
+        None
+    """
     st.subheader("Generate GTM Plan")
-    prd_text = st.text_area("#### Enter your PRD here", placeholder="Paste your PRD here to generate GTM plan", height = 400)
-    other_details = st.text_area("#### Addition Details", placeholder="Share any details that will be helpful with GTM planning", height = 200)
+    prd_text = st.text_area("#### Enter your PRD here", placeholder="Paste your PRD here to generate GTM plan", height=400)
+    other_details = st.text_area("#### Addition Details", placeholder="Share any details that will be helpful with GTM planning", height=200)
     tracking_button = st.button("Generate GTM Plan", type="primary")
 
     if tracking_button:
         if not prd_text:
-            st.warning("Please enter a all the details")
+            st.warning("Please enter all the details")
         else:
             with st.spinner('Generating Plan...'):
                 try:
-                    user_prompt = f"Genearte the GTM Plan for: \n ## Product Requirements Decument \n {prd_text} \n ## Other Details \n {other_details} \n RESPOND in Markdown Only."
+                    user_prompt = f"Generate the GTM Plan for: \n ## Product Requirements Document \n {prd_text} \n ## Other Details \n {other_details} \n RESPOND in Markdown Only."
                     llm_model.system_prompt = system_prompt_GTM
                     draft_plan, input_tokens, output_tokens = llm_model.generate_text(
-                        prompt = user_prompt, temperature=0.2 
+                        prompt=user_prompt, temperature=0.2
                     )
                     st.session_state['history'].append({'role': 'user', 'content': draft_plan})
                     status_message = "Draft GTM Done. Reviewing the plan..."
                     st.info(status_message)
                     llm_model.system_prompt = system_prompt_GTM_critique
                     critique_response, input_tokens, output_tokens = llm_model.generate_text(
-                        prompt = f"Critique the GTM Plan: {draft_plan}. Only respond in Markdown format. BE DETAILED. If you think user is not asking for GTM plan return nothing.\n Context: ### PRD \n {prd_text} \n ### Additional Details \n {other_details} ",
+                        prompt=f"Critique the GTM Plan: {draft_plan}. Only respond in Markdown format. BE DETAILED. If you think user is not asking for GTM plan return nothing.\n Context: ### PRD \n {prd_text} \n ### Additional Details \n {other_details} ",
                         temperature=0.3
                     )
                     st.session_state['history'].append({'role': 'user', 'content': critique_response})
@@ -283,9 +301,9 @@ def gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm_model, ll
                     st.info(status_message)
                     llm_model.system_prompt = system_prompt_GTM
                     response, input_tokens, output_tokens = llm_model.generate_text(
-                        prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for GTM plan return nothing.",
-                        temperature=0.1                    
-                    )                                          
+                        prompt=f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for GTM plan return nothing.",
+                        temperature=0.1
+                    )
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
                     # Download button for the plan
@@ -294,9 +312,9 @@ def gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm_model, ll
                         data=response,
                         file_name="gtm_plan.md",
                         mime="text/markdown"
-                    )                       
+                    )
                 except Exception as e:
-                    st.error(f"Failed to generate gtm plan. Please try again later. Error: {str(e)}")
+                    st.error(f"Failed to generate GTM plan. Please try again later. Error: {str(e)}")
     pass
 
 # def summarize_yt(system_prompt_yt_planner, prompt_yt_summary,llm_model):
