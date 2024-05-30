@@ -106,6 +106,7 @@ def auth_screen(supabase):
             st.session_state['logged_in'] = False
             st.session_state.pop('user', None)
             controller.remove('prd_prateek')
+            res = supabase.auth.sign_out()
             st.rerun()
     else:
         auth_mode = st.radio("Select mode", ["Login", "Register"])
