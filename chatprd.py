@@ -1,4 +1,9 @@
 import streamlit as st
+st.set_page_config(
+    page_title="PM Toolkit",
+    page_icon="🥊",
+    layout="wide",
+    )
 #from dotenv import load_dotenv
 # import llm
 import os
@@ -41,11 +46,6 @@ def main():
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
     # Authenticate the user
     # authenticate()
-    st.set_page_config(
-    page_title="PM Toolkit",
-    page_icon="🥊",
-    layout="wide",
-    )
     if 'history' not in st.session_state:
         st.session_state['history'] = []
     auth_screen(supabase,controller)
