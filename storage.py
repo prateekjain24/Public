@@ -51,7 +51,7 @@ def delete_record(table_name, record_id, supabase):
     else:
         print('Failed to delete record.')
 
-def create_data(user, product_name, product_description, output, is_create_new):
+def create_data_prd(user, product_name, product_description, output, is_create_new):
     """
     Create a data dictionary with the provided parameters.
 
@@ -71,5 +71,24 @@ def create_data(user, product_name, product_description, output, is_create_new):
         'product_description': product_description,
         'output': output,
         'is_create_new': is_create_new
+    }
+    return data
+
+def create_data_brainstorm(user, message, is_user):
+    """
+    Create a data dictionary for brainstorming.
+
+    Args:
+        user (str): The user's name.
+        message (str): The brainstorming message.
+        is_user (bool): Indicates whether the message is from the user or bot.
+
+    Returns:
+        dict: A dictionary containing the user, message, and is_user values.
+    """
+    data = {
+        'user': user,
+        'message': message,
+        'is_user': is_user
     }
     return data
