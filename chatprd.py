@@ -17,8 +17,6 @@ SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 #res = supabase.auth.get_session()
 # Using Streamlit's session state to store temporary memory
-if 'history' not in st.session_state:
-    st.session_state['history'] = []
 
 def main():
     """
@@ -48,6 +46,8 @@ def main():
     page_icon="🥊",
     layout="wide",
     )
+    if 'history' not in st.session_state:
+        st.session_state['history'] = []
     auth_screen(supabase,controller)
     # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
