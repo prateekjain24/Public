@@ -3,10 +3,9 @@ import os
 import re
 import jwt
 import datetime
-from streamlit_cookies_controller import CookieController
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-controller = CookieController()
+
 
 
 def check_authentication(password):
@@ -50,7 +49,7 @@ def verify_jwt(token):
     except jwt.InvalidTokenError:
         return None
 
-def authenticate_user(email, password, supabase):
+def authenticate_user(email, password, supabase, controller):
     try:
         response = supabase.auth.sign_in_with_password({"email": email, "password": password})
         if response.user:
@@ -85,7 +84,7 @@ def register_user(email, password, supabase):
         st.error(f"Registration failed: {e}")
 
 
-def auth_screen(supabase):
+def auth_screen(supabase, controller):
 
     if controller.get('prd_prateek'):
         token = controller.get('prd_prateek')
@@ -118,7 +117,7 @@ def auth_screen(supabase):
         if auth_mode == "Login":
             if st.button("Log In", key="login"):
                 if is_valid_email(email):
-                    authenticate_user(email, password, supabase)
+                    authenticate_user(email, password, supabase, controller)
                 else:
                     st.error("Please enter a valid email address")
             if st.button("Forgot Password?", key="forgot_password"):

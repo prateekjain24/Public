@@ -7,7 +7,7 @@ from features import create_prd, improve_prd, brainstorm_features, view_history,
 from utils import load_prompts
 from models import build_models
 from supabase import create_client, Client
-
+from streamlit_cookies_controller import CookieController
 
 
 #load_dotenv()
@@ -28,6 +28,7 @@ def main():
     The user can choose to create a PRD, improve a PRD, brainstorm features, create a tracking plan, create a GTM plan, or view history.
     Each option calls a specific function to perform the corresponding task.
     """
+    controller = CookieController()
     prompts = load_prompts()
     fast_llm, quality_llm = build_models()
     system_prompt_prd = prompts['system_prompt_prd']
@@ -47,7 +48,7 @@ def main():
     page_icon="🥊",
     layout="wide",
     )
-    auth_screen(supabase)
+    auth_screen(supabase,controller)
     # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         st.sidebar.title("Select the Task:")
