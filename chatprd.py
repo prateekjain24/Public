@@ -57,7 +57,7 @@ def main():
         elif option == "Improve PRD":
             improve_prd(system_prompt_prd,system_prompt_director,quality_llm,supabase)
         elif option == "Brainstorm Features":
-            brainstorm_features(system_prompt_brainstorm,quality_llm)
+            brainstorm_features(system_prompt_brainstorm,quality_llm,supabase)
         elif option == "Tracking Plan":
             tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, quality_llm)
         elif option == "Create GTM Plan":
