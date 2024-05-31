@@ -77,7 +77,7 @@ def register_user(email, password, supabase):
     try:
         response = supabase.auth.sign_up({"email": email, "password": password})
         if response.user:
-            st.success("Registration successful. Email confirmation email sent. COnfirm your email & then login.")
+            st.success("Registration successful. Click on login to begin.")
         else:
             st.error("Registration failed. Please try again.")
     except Exception as e:
