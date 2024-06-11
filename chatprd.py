@@ -56,7 +56,7 @@ def main():
                 key="task",
                 options=["Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"],
                 )
-        st.markdown(
+        st.sidebar.markdown(
         """<style>
             div[class*="stRadio"] > label > div[data-testid="stMarkdownContainer"] > p {
             font-size: 32px;
