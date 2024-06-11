@@ -52,7 +52,7 @@ def main():
     # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         option = st.sidebar.radio(
-                "# **Select the Task** 👉",
+                "# **Select the Task**",
                 key="task",
                 options=["Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"],
                 )
