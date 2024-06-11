@@ -56,6 +56,13 @@ def main():
                 key="task",
                 options=["Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"],
                 )
+        st.markdown(
+        """<style>
+            div[class*="stRadio"] > label > div[data-testid="stMarkdownContainer"] > p {
+            font-size: 32px;
+            }
+            </style>
+        """, unsafe_allow_html=True)
         #option = st.sidebar.selectbox("### Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
         if option == "Create PRD":
             create_prd(system_prompt_prd,system_prompt_director, quality_llm, fast_llm,supabase)
