@@ -301,7 +301,7 @@ def gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm_model, l
                     llm_model.system_prompt = system_prompt_GTM
                     response, input_tokens, output_tokens = llm_model.generate_text(
                         prompt=f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for GTM plan return nothing.",
-                        temperature=0.1
+                        temperature=0.4
                     )
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
