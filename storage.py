@@ -14,22 +14,21 @@ def create_record(table_name, data, supabase):
     """
     response, count = supabase.table(table_name).insert(data).execute()
 
-def read_records(table_name, supabase):
+def read_records(table_name, email_id, supabase):
     """
-    Read records from the specified table.
+    Read records from the specified table based on the user's email ID.
 
     Args:
         table_name (str): The name of the table to read records from.
+        email_id (str): The email ID of the user to filter records.
         supabase (SupabaseClient): The Supabase client object.
 
     Returns:
         None
     """
-    response = supabase.table(table_name).select().execute()
+    response = supabase.table(table_name).select().eq('user', email_id).execute()
     if response['status_code'] == 200:
         records = response['data']
-        for record in records:
-            print(record)
     else:
         print('Failed to fetch records.')
 
