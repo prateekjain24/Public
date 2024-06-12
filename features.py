@@ -185,19 +185,6 @@ def brainstorm_features(system_prompt_brainstorm,llm_model,supabase):
             st.error(f"Failed to save brainstorm message to database. Error: {str(e)}")
     pass    
 
-def view_history():
-    """
-    View the history of all the interactions with the assistant.
-    Returns:
-        None
-    """
-    st.subheader("View History")
-    if st.session_state['history']:
-        for item in st.session_state['history']:
-            st.json(item)
-    else:
-        st.info("No history available yet.")
-    pass
 
 def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model):
     """
@@ -329,41 +316,23 @@ def gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm_model, l
                     st.error(f"Failed to generate GTM plan. Please try again later. Error: {str(e)}")
     pass
 
-# def summarize_yt(system_prompt_yt_planner, prompt_yt_summary,llm_model):
+def view_history(supabase):
+    """
+    View the history of generated PRDs and GTM plans.
 
-#     st.title("YouTube Audio Processor")
-#     youtube_url = st.text_input("Enter YouTube URL (not more then 15 mins)")
-
-#     if st.button("Process Audio"):
-#         if youtube_url:
-#             with st.spinner('Downloading and processing audio...'):
-#                 audio_path = download_audio(youtube_url)
-#                 if audio_path:
-#                     transcription = transcribe_audio(audio_path)
-#                     if transcription:
-#                         yt_plan = llm_model.prompt(
-#                             transcription, system=system_prompt_yt_planner, temperature=0.2 
-#                         )
-#                         st.session_state['history'].append({'role': 'user', 'content': yt_plan.text()})
-#                         status_message = "Planning done..."
-#                         st.info(status_message)
-#                         yt_execute = llm_model.prompt(
-#                             f"Given the Summarisation Plan: {yt_plan.text()}, Summarize the yourtube transcript {transcription}. Only respond in Markdown format. BE VERY DETAILED.",
-#                                 system=prompt_yt_summary, temperature=0.3
-#                         )
-#                         st.session_state['history'].append({'role': 'user', 'content': yt_execute.text()})                                      
-#                         st.markdown(yt_execute, unsafe_allow_html=True)
-#                         # Download button for the summary
-#                         st.download_button(
-#                             label="Download PRD as Markdown",
-#                             data=yt_execute.text(),
-#                             file_name="yt_summary.md",
-#                             mime="text/markdown"
-#                         )    
-#                     else:
-#                         st.error("Transcription failed.")
-#                 else:
-#                     st.error("Audio download failed.")
-#         else:
-#             st.warning("Please enter a valid YouTube URL.")
-#     pass
+    Returns:
+        None
+    """
+    st.subheader("View History")
+    records = read_records(prd_table, st.session_state['user']['email'], supabase)
+    for record in records:
+        with st.expander(f"Generated on: {record['created_at']}"):
+            st.markdown(record['product_name'])
+            st.markdown(record['output'])
+            st.download_button(
+                label="Download PRD as Markdown",
+                data=record['output'],
+                file_name=f"prd_{record['product_name']}.md",
+                mime="text/markdown"
+            )
+    pass

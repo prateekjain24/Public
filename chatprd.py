@@ -69,7 +69,7 @@ def main():
         elif option == "Create GTM Plan":
             gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm, quality_llm)
         elif option == "View History":
-            view_history()
+            view_history(supabase)
 
 if __name__ == "__main__":
     main()
