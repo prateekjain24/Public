@@ -27,10 +27,7 @@ def read_records(table_name, email_id, supabase):
         None
     """
     response = supabase.table(table_name).select().eq('user', email_id).execute()
-    if response['status_code'] == 200:
-        records = response['data']
-    else:
-        print('Failed to fetch records.')
+    records = response['data']
     return records
 
 def delete_record(table_name, record_id, supabase):
