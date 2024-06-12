@@ -35,6 +35,7 @@ def main():
     prompts = load_prompts()
     fast_llm, quality_llm = build_models()
     system_prompt_prd = prompts['system_prompt_prd']
+    system_prompt_prd_experimental = prompts['system_prompt_prd_experimental']
     system_prompt_director = prompts['system_prompt_director']
     system_prompt_brainstorm = prompts['system_prompt_brainstorm']
     system_prompt_tracking = prompts['system_prompt_tracking']
@@ -58,7 +59,7 @@ def main():
                 )
         #option = st.sidebar.selectbox("### Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
         if option == "Create PRD":
-            create_prd(system_prompt_prd,system_prompt_director, quality_llm, fast_llm,supabase)
+            create_prd(system_prompt_prd_experimental,system_prompt_director, quality_llm, fast_llm,supabase)
         elif option == "Improve PRD":
             improve_prd(system_prompt_prd,system_prompt_director,quality_llm,supabase)
         elif option == "Brainstorm Features":
