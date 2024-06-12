@@ -327,7 +327,7 @@ def view_history(supabase):
     st.subheader("View History")
     records = read_records(prd_table, st.session_state['user']['email'], supabase)
     for record in records:
-        with st.expander(f"Generated on: {record['created_at']}"):
+        with st.expander(f"{record['product_name']} - Generated on: {record['created_at']}"):
             st.markdown(record['product_name'])
             st.markdown(record['output'])
             st.download_button(
