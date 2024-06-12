@@ -61,7 +61,7 @@ def main():
         if option == "Create PRD":
             create_prd(system_prompt_prd_experimental,system_prompt_director, quality_llm, fast_llm,supabase)
         elif option == "Improve PRD":
-            improve_prd(system_prompt_prd,system_prompt_director,quality_llm,supabase)
+            improve_prd(system_prompt_prd_experimental,system_prompt_director,quality_llm,supabase)
         elif option == "Brainstorm Features":
             brainstorm_features(system_prompt_brainstorm,quality_llm,supabase)
         elif option == "Tracking Plan":
