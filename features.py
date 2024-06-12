@@ -324,7 +324,7 @@ def view_history(supabase):
         None
     """
     prd_table = os.environ.get('SUPABASE_TABLE')
-    st.subheader("View History")
+    st.subheader("View PRD Generation History")
     records = read_records(prd_table, st.session_state['user']['email'], supabase)
     for record in records:
         with st.expander(f"{record['product_name']} - Generated on: {record['created_at']}"):
