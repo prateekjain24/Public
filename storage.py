@@ -31,6 +31,7 @@ def read_records(table_name, email_id, supabase):
         records = response['data']
     else:
         print('Failed to fetch records.')
+    return records
 
 def delete_record(table_name, record_id, supabase):
     """

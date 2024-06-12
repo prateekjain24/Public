@@ -323,6 +323,7 @@ def view_history(supabase):
     Returns:
         None
     """
+    prd_table = os.environ.get('SUPABASE_TABLE')
     st.subheader("View History")
     records = read_records(prd_table, st.session_state['user']['email'], supabase)
     for record in records:
