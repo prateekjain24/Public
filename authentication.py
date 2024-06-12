@@ -56,7 +56,7 @@ def authenticate_user(email, password, supabase, controller):
             user_email = response.user.email  # Accessing user email correctly
             token = generate_jwt(user_email)
             expiration_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=15)
-            controller.set('prd_prateek', token,"/",expiration_date)
+            controller.set('prd_prateek', token,"/",expiration_date,1000000,"tools.prateek.ai")
             st.session_state['logged_in'] = True
             st.session_state['user'] = response.user
             st.success(f"Welcome {user_email}")
