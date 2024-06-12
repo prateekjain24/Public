@@ -27,7 +27,9 @@ def read_records(table_name, email_id, supabase):
         None
     """
     response = supabase.table(table_name).select().eq('user', email_id).execute()
-    records = response['data']
+    if response.error:
+        raise Exception(response.error.message)
+    records = response.data
     return records
 
 def delete_record(table_name, record_id, supabase):
