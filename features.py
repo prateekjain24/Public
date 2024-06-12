@@ -334,6 +334,7 @@ def view_history(supabase):
                 label="Download PRD as Markdown",
                 data=record['output'],
                 file_name=f"prd_{record['product_name']}.md",
-                mime="text/markdown"
+                mime="text/markdown",
+                key=f"prd_{record['id']}"
             )
     pass

@@ -26,7 +26,8 @@ def read_records(table_name, email_id, supabase):
     Returns:
         None
     """
-    response, count = supabase.table(table_name).select().eq('user', email_id).execute()
+    response = supabase.table(table_name).select("*").eq('user', email_id).execute()
+
     records = response.data
     return records
 

@@ -4,7 +4,7 @@ st.set_page_config(
     page_icon="🥊",
     layout="wide",
     )
-#from dotenv import load_dotenv
+
 # import llm
 import os
 from authentication import authenticate , auth_screen 
@@ -14,7 +14,7 @@ from models import build_models
 from supabase import create_client, Client
 from streamlit_cookies_controller import CookieController
 
-
+#from dotenv import load_dotenv
 #load_dotenv()
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
