@@ -26,7 +26,7 @@ def read_records(table_name, email_id, supabase):
     Returns:
         None
     """
-    response = supabase.table(table_name).select("*").eq('user', email_id).execute()
+    response = supabase.table(table_name).select("*").eq('user', email_id).order('created_at', desc=True).execute()
 
     records = response.data
     return records
