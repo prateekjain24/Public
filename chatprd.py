@@ -8,7 +8,7 @@ st.set_page_config(
 # import llm
 import os
 from authentication import authenticate , auth_screen 
-from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan, gtm_planner
+from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan, gtm_planner, abc_test_significance
 from utils import load_prompts
 from models import build_models
 from supabase import create_client, Client
@@ -55,7 +55,7 @@ def main():
         option = st.sidebar.radio(
                 "# Select the Task 👉",
                 key="task",
-                options=["Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"],
+                options=["Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","A/B/C Test Significance","View History"],
                 )
         #option = st.sidebar.selectbox("### Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
         if option == "Create PRD":
@@ -68,6 +68,8 @@ def main():
             tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, quality_llm)
         elif option == "Create GTM Plan":
             gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm, quality_llm)
+        elif option == "A/B/C Test Significance":
+            abc_test_significance(quality_llm)
         elif option == "View History":
             view_history(supabase)
 
