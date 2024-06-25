@@ -28,7 +28,7 @@ class AnthropicWrapper:
         """Sets the system prompt."""
         self._system_prompt = value
     
-    def generate_text(self, prompt, max_tokens=4000, temperature=0.7, **kwargs):
+    def generate_text(self, prompt, max_tokens=4000, temperature=0.5, **kwargs):
         """
         Generate text using the specified model.
 
@@ -41,20 +41,19 @@ class AnthropicWrapper:
         Returns:
         - Generated text from the model, input tokens count, and output tokens count.
         """
-        system_message = f"{self.system_prompt}\n\n" if self.system_prompt else ""
-        full_prompt = f"{system_message}{HUMAN_PROMPT} {prompt}{AI_PROMPT}"
-
-        response = self.client.completions.create(
+        messages = [{"role": "user", "content": prompt}]
+        
+        response = self.client.messages.create(
             model=self.model,
-            prompt=full_prompt,
-            max_tokens_to_sample=max_tokens,
+            messages=messages,
+            system=self.system_prompt,
+            max_tokens=max_tokens,
             temperature=temperature,
             **kwargs
         )
 
-        # Anthropic API doesn't provide token counts directly, so we'll estimate
-        # You may want to implement a more accurate token counting method
-        input_tokens = len(full_prompt.split())
-        output_tokens = len(response.completion.split())
-
-        return response.completion, input_tokens, output_tokens
+        return (
+            response.content[0].text,
+            response.usage.input_tokens,
+            response.usage.output_tokens
+        )
