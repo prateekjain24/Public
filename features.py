@@ -282,9 +282,9 @@ def gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm_model, l
         else:
             with st.spinner('Generating Plan...'):
                 try:
-                    user_prompt = f"Generate the GTM Plan for: \n ## Product Requirements Document \n {prd_text} \n ## Other Details \n {other_details} \n RESPOND in Markdown Only."
+                    user_prompt = f"Generate the Go To Market Plan for: \n ## Product Requirements Document \n {prd_text} \n ## Other Details \n {other_details} \n RESPOND in Markdown Only."
                     llm_model.system_prompt = system_prompt_GTM
-                    draft_plan, input_tokens, output_tokens = llm_model.generate_text(
+                    draft_plan, input_tokens, output_tokens = fast_llm_model.generate_text(
                         prompt=user_prompt, temperature=0.2
                     )
                     st.session_state['history'].append({'role': 'user', 'content': draft_plan})
@@ -299,7 +299,7 @@ def gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm_model, l
                     status_message = "Making final adjustments.."
                     st.info(status_message)
                     llm_model.system_prompt = system_prompt_GTM
-                    response, input_tokens, output_tokens = llm_model.generate_text(
+                    response, input_tokens, output_tokens = fast_llm_model.generate_text(
                         prompt=f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for GTM plan return nothing.",
                         temperature=0.4
                     )
