@@ -1,5 +1,6 @@
 from api.llm.openai_llm import OpenAIWrapper
 from api.llm.groq_llm import GroqWrapper
+from api.llm.anthropic_llm import AnthropicWrapper
 import os
 import openai
 import streamlit as st
@@ -14,8 +15,10 @@ def build_models():
     """
     gpt4_model = OpenAIWrapper(model ="gpt-4o")
     groq_model = GroqWrapper(model = "llama3-70b-8192")
+    claude_model = AnthropicWrapper(model="claude-3-5-sonnet-20240620")
 
-    return groq_model, gpt4_model
+
+    return claude_model, gpt4_model
 
 def transcribe_audio(audio_path):
     """Transcribe the downloaded audio file using OpenAI's Whisper model."""

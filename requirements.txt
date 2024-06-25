@@ -11,3 +11,4 @@ yt-dlp
 supabase
 PyJWT
 streamlit-cookies-controller
+anthropic
