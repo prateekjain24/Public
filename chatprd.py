@@ -14,8 +14,8 @@ from models import build_models
 from supabase import create_client, Client
 from streamlit_cookies_controller import CookieController
 
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
