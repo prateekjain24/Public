@@ -7,28 +7,10 @@ from streamlit_cookies_controller import CookieController
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-def is_valid_email(email):
-    """Validate the email format."""
-    regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    return re.match(regex, email)
-
-def generate_jwt(user_email):
-    expiration = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
-    token = jwt.encode({"email": user_email, "exp": expiration}, SECRET_KEY, algorithm="HS256")
-    return token
-
-def verify_jwt(token):
-    try:
-        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return decoded_token
-    except jwt.ExpiredSignatureError:
-        return None
-    except jwt.InvalidTokenError:
-        return None
+# ... (keep other functions unchanged)
 
 def set_auth_cookie(cookie_controller, token):
-    expiration = datetime.datetime.now() + datetime.timedelta(days=30)
-    cookie_controller.set('auth_token', token, expires_at=expiration, key='set_auth')
+    cookie_controller.set('auth_token', token, key='set_auth')
 
 def get_auth_cookie(cookie_controller):
     return cookie_controller.get('auth_token')
@@ -52,22 +34,7 @@ def authenticate_user(email, password, supabase, cookie_controller):
     except Exception as e:
         st.error(f"Authentication failed: {e}")
 
-def send_reset_password_email(email, supabase):
-    try:
-        supabase.auth.reset_password_for_email(email)
-        st.success("Password reset email sent. Please check your inbox.")
-    except Exception as e:
-        st.error(f"Failed to send password reset email: {e}")
-
-def register_user(email, password, supabase):
-    try:
-        response = supabase.auth.sign_up({"email": email, "password": password})
-        if response.user:
-            st.success("Registration successful. Click on login to begin.")
-        else:
-            st.error("Registration failed. Please try again.")
-    except Exception as e:
-        st.error(f"Registration failed: {e}")
+# ... (keep other functions unchanged)
 
 def auth_screen(supabase):
     cookie_controller = CookieController()
