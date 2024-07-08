@@ -45,14 +45,8 @@ def set_auth_cookie(token):
     st.components.v1.html(js_code, height=0)
 
 def get_auth_cookie():
-    if 'auth_token' not in st.session_state:
-        cookie_manager = stx.CookieManager()
-        auth_token = cookie_manager.get('auth_token')
-        if auth_token:
-            st.session_state.auth_token = auth_token
-        else:
             # If cookie_manager doesn't find the token, try JavaScript approach
-            component_value = st.components.v1.html(
+        component_value = st.components.v1.html(
                 """
                 <script>
                 function getCookie(name) {
@@ -73,10 +67,9 @@ def get_auth_cookie():
                 """,
                 height=0
             )
-            if component_value is not None:
-                st.session_state.auth_token = component_value
-
-    return st.session_state.get('auth_token')
+        if component_value is not None:
+            st.session_state.auth_token = component_value
+        return st.session_state.get('auth_token')
 
 def clear_auth_cookie():
     js_code = """
