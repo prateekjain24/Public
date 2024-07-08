@@ -30,7 +30,6 @@ def main():
     The user can choose to create a PRD, improve a PRD, brainstorm features, create a tracking plan, create a GTM plan, or view history.
     Each option calls a specific function to perform the corresponding task.
     """
-    controller = CookieController()
     prompts = load_prompts()
     fast_llm, quality_llm = build_models()
     system_prompt_prd = prompts['system_prompt_prd']
