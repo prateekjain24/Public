@@ -4,6 +4,7 @@ import re
 import jwt
 import datetime
 import json
+import extra_streamlit_components as stx
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 

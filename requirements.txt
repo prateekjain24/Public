@@ -13,3 +13,4 @@ supabase
 PyJWT
 streamlit-cookies-controller
 anthropic
+extra-streamlit-components
