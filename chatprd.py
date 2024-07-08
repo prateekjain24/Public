@@ -7,7 +7,7 @@ st.set_page_config(
 
 # import llm
 import os
-from authentication import authenticate , auth_screen 
+from authentication import auth_screen 
 from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan, gtm_planner, abc_test_significance
 from utils import load_prompts
 from models import build_models
