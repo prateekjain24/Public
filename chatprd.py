@@ -12,7 +12,6 @@ from features import create_prd, improve_prd, brainstorm_features, view_history,
 from utils import load_prompts
 from models import build_models
 from supabase import create_client, Client
-from streamlit_cookies_controller import CookieController
 
 #from dotenv import load_dotenv
 #load_dotenv()
@@ -49,7 +48,7 @@ def main():
     # authenticate()
     if 'history' not in st.session_state:
         st.session_state['history'] = []
-    auth_screen(supabase,controller)
+    auth_screen(supabase)
     # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         option = st.sidebar.radio(
