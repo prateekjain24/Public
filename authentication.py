@@ -44,46 +44,38 @@ def set_auth_cookie(token):
     st.components.v1.html(js_code, height=0)
 
 def get_auth_cookie():
-    js_code = """
-    <script>
-    function getCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-        }
-        return null;
-    }
-    var auth_token = getCookie('auth_token');
-    if (auth_token) {
-        window.parent.postMessage({type: 'SET_COOKIE', cookie: auth_token}, '*');
-    }
-    </script>
-    """
-    st.components.v1.html(js_code, height=0)
-    
-    # Use session state to get the cookie value
     if 'auth_token' not in st.session_state:
-        st.session_state.auth_token = None
-    
-    # JavaScript to send the cookie value to session state
-    st.components.v1.html(
-        """
-        <script>
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'SET_COOKIE') {
-                window.parent.Streamlit.setComponentValue(event.data.cookie);
-            }
-        }, false);
-        </script>
-        """,
-        height=0
-    )
-    
-    # Return the cookie value from session state
-    return st.session_state.auth_token
+        cookie_manager = stx.CookieManager()
+        auth_token = cookie_manager.get('auth_token')
+        if auth_token:
+            st.session_state.auth_token = auth_token
+        else:
+            # If cookie_manager doesn't find the token, try JavaScript approach
+            component_value = st.components.v1.html(
+                """
+                <script>
+                function getCookie(name) {
+                    var nameEQ = name + "=";
+                    var ca = document.cookie.split(';');
+                    for(var i=0;i < ca.length;i++) {
+                        var c = ca[i];
+                        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+                    }
+                    return null;
+                }
+                var auth_token = getCookie('auth_token');
+                if (auth_token) {
+                    window.parent.Streamlit.setComponentValue(auth_token);
+                }
+                </script>
+                """,
+                height=0
+            )
+            if component_value is not None:
+                st.session_state.auth_token = component_value
+
+    return st.session_state.get('auth_token')
 
 def clear_auth_cookie():
     js_code = """
