@@ -104,7 +104,7 @@ def authenticate_user(email, password, supabase):
             token = generate_jwt(user_email)
             set_auth_cookie(token)
             st.session_state['logged_in'] = True
-            st.session_state['user'] = response.user
+            st.session_state['user'] = {"email": user_email}  # Store email as a dictionary
             st.success(f"Welcome {user_email}")
             st.rerun()
         else:
