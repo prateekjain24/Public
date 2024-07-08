@@ -3,7 +3,7 @@ import os
 import re
 import jwt
 import datetime
-from streamlit_cookies_controller import CookieController
+import json
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -26,22 +26,83 @@ def verify_jwt(token):
     except jwt.InvalidTokenError:
         return None
 
-def set_auth_cookie(cookie_controller, token):
-    cookie_controller.set('auth_token', token)
+def set_auth_cookie(token):
+    js_code = f"""
+    <script>
+    function setCookie(name, value, days) {{
+        var expires = "";
+        if (days) {{
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }}
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }}
+    setCookie('auth_token', '{token}', 30);
+    </script>
+    """
+    st.components.v1.html(js_code, height=0)
 
-def get_auth_cookie(cookie_controller):
-    return cookie_controller.get('auth_token')
+def get_auth_cookie():
+    js_code = """
+    <script>
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+    var auth_token = getCookie('auth_token');
+    if (auth_token) {
+        window.parent.postMessage({type: 'GET_COOKIE', cookie: auth_token}, '*');
+    }
+    </script>
+    """
+    st.components.v1.html(js_code, height=0)
+    
+    # Use a placeholder to update with the cookie value
+    cookie_placeholder = st.empty()
+    
+    # JavaScript to send the cookie value back to Python
+    st.components.v1.html(
+        f"""
+        <script>
+        window.addEventListener('message', function(event) {{
+            if (event.data.type === 'GET_COOKIE') {{
+                var data = JSON.stringify(event.data);
+                {cookie_placeholder.element.text_input.js('value', f'JSON.parse(`${{data}}`).cookie')}
+            }}
+        }}, false);
+        </script>
+        """,
+        height=0
+    )
+    
+    # Return the cookie value
+    return cookie_placeholder.text_input("", key="cookie_value", label_visibility="hidden")
 
-def clear_auth_cookie(cookie_controller):
-    cookie_controller.delete('auth_token')
+def clear_auth_cookie():
+    js_code = """
+    <script>
+    function deleteCookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    deleteCookie('auth_token');
+    </script>
+    """
+    st.components.v1.html(js_code, height=0)
 
-def authenticate_user(email, password, supabase, cookie_controller):
+def authenticate_user(email, password, supabase):
     try:
         response = supabase.auth.sign_in_with_password({"email": email, "password": password})
         if response.user:
             user_email = response.user.email
             token = generate_jwt(user_email)
-            set_auth_cookie(cookie_controller, token)
+            set_auth_cookie(token)
             st.session_state['logged_in'] = True
             st.session_state['user'] = response.user
             st.success(f"Welcome {user_email}")
@@ -69,10 +130,8 @@ def register_user(email, password, supabase):
         st.error(f"Registration failed: {e}")
 
 def auth_screen(supabase):
-    cookie_controller = CookieController()
-
     # Check for existing auth token
-    auth_token = get_auth_cookie(cookie_controller)
+    auth_token = get_auth_cookie()
     if auth_token:
         user_data = verify_jwt(auth_token)
         if user_data:
@@ -80,7 +139,7 @@ def auth_screen(supabase):
             st.session_state['user'] = {"email": user_data["email"]}
         else:
             st.session_state['logged_in'] = False
-            clear_auth_cookie(cookie_controller)
+            clear_auth_cookie()
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
@@ -90,7 +149,7 @@ def auth_screen(supabase):
         if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
             st.session_state.pop('user', None)
-            clear_auth_cookie(cookie_controller)
+            clear_auth_cookie()
             supabase.auth.sign_out()
             st.rerun()
     else:
@@ -103,7 +162,7 @@ def auth_screen(supabase):
         if auth_mode == "Login":
             if st.button("Log In", key="login"):
                 if is_valid_email(email):
-                    authenticate_user(email, password, supabase, cookie_controller)
+                    authenticate_user(email, password, supabase)
                 else:
                     st.error("Please enter a valid email address")
             if st.button("Forgot Password?", key="forgot_password"):
