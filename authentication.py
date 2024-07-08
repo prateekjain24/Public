@@ -27,13 +27,13 @@ def verify_jwt(token):
         return None
 
 def set_auth_cookie(cookie_controller, token):
-    cookie_controller.set('auth_token', token, key='set_auth')
+    cookie_controller.set('auth_token', token)
 
 def get_auth_cookie(cookie_controller):
     return cookie_controller.get('auth_token')
 
 def clear_auth_cookie(cookie_controller):
-    cookie_controller.remove('auth_token', key='clear_auth')
+    cookie_controller.delete('auth_token')
 
 def authenticate_user(email, password, supabase, cookie_controller):
     try:
