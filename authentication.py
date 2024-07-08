@@ -58,32 +58,32 @@ def get_auth_cookie():
     }
     var auth_token = getCookie('auth_token');
     if (auth_token) {
-        window.parent.postMessage({type: 'GET_COOKIE', cookie: auth_token}, '*');
+        window.parent.postMessage({type: 'SET_COOKIE', cookie: auth_token}, '*');
     }
     </script>
     """
     st.components.v1.html(js_code, height=0)
     
-    # Use a placeholder to update with the cookie value
-    cookie_placeholder = st.empty()
+    # Use session state to get the cookie value
+    if 'auth_token' not in st.session_state:
+        st.session_state.auth_token = None
     
-    # JavaScript to send the cookie value back to Python
+    # JavaScript to send the cookie value to session state
     st.components.v1.html(
-        f"""
+        """
         <script>
-        window.addEventListener('message', function(event) {{
-            if (event.data.type === 'GET_COOKIE') {{
-                var data = JSON.stringify(event.data);
-                {cookie_placeholder.element.text_input.js('value', f'JSON.parse(`${{data}}`).cookie')}
-            }}
-        }}, false);
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'SET_COOKIE') {
+                window.parent.Streamlit.setComponentValue(event.data.cookie);
+            }
+        }, false);
         </script>
         """,
         height=0
     )
     
-    # Return the cookie value
-    return cookie_placeholder.text_input("", key="cookie_value", label_visibility="hidden")
+    # Return the cookie value from session state
+    return st.session_state.auth_token
 
 def clear_auth_cookie():
     js_code = """
