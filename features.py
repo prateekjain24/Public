@@ -368,6 +368,11 @@ def abc_test_significance(quality_llm):
     
     st.button("Add Variant", on_click=add_variant)
     
+    st.markdown("### Significance Level")
+    st.markdown("The significance level (alpha) is the probability of rejecting the null hypothesis when it is true. "  
+            "A lower value (e.g., 0.01) means stronger evidence is required to reject the null hypothesis and "
+            "declare a significant result, while a higher value (e.g., 0.10) requires less evidence but increases "
+            "the risk of a Type I error (false positive).")
     significance_level = st.slider("Significance Level", min_value=0.01, max_value=0.10, value=0.05, step=0.01)
     
     if st.button("Calculate Significance"):
