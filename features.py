@@ -326,7 +326,7 @@ def view_history(supabase):
             )
     pass
 
-def abc_test_significance(quality_llm):
+def abc_test_significance(quality_llm, system_prompt_ab_test):
     st.subheader("A/B/C Test Significance Checker")
     
     # Initialize session state for variants if it doesn't exist
@@ -431,8 +431,7 @@ def abc_test_significance(quality_llm):
         outlined in the PRD.
         """
         
-        quality_llm.system_prompt = "You are an expert data scientist specializing in A/B testing, A/B/C testing, and statistical analysis for product decisions. You also have a deep understanding of product management and can relate statistical findings to product requirements and goals."
-        
+        quality_llm.system_prompt = system_prompt_ab_test
         st.markdown("### AI Interpretation")
         with st.spinner("Generating AI interpretation... This may take a few moments."):
             interpretation, _, _ = quality_llm.generate_text(interpretation_prompt)

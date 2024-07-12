@@ -43,6 +43,7 @@ def main():
     prompt_yt_summary = prompts['prompt_yt_summary']
     system_prompt_GTM = prompts['system_prompt_GTM']
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
+    system_prompt_ab_test = prompts['system_prompt_ab_test']
     # Authenticate the user
     # authenticate()
     if 'history' not in st.session_state:
@@ -67,7 +68,7 @@ def main():
         elif option == "Create GTM Plan":
             gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm, quality_llm)
         elif option == "A/B/C Test Significance":
-            abc_test_significance(quality_llm)
+            abc_test_significance(quality_llm, system_prompt_ab_test)
         elif option == "View History":
             view_history(supabase)
 
