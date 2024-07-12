@@ -347,21 +347,21 @@ def abc_test_significance(quality_llm):
             del st.session_state.variants[index]
     
     # Function to update variant data
-    def update_variant(index, field, value):
-        st.session_state.variants[index][field] = value
+    def update_variant(index, field):
+        st.session_state.variants[index][field] = st.session_state[f"{field}_{index}"]
     
     # Display variants
     for i, variant in enumerate(st.session_state.variants):
         col1, col2, col3, col4 = st.columns([3, 3, 3, 1])
         with col1:
             st.text_input("Variant Name", value=variant['name'], key=f"name_{i}", 
-                          on_change=update_variant, args=(i, 'name', st.session_state[f"name_{i}"]))
+                          on_change=update_variant, args=(i, 'name'))
         with col2:
             st.number_input("Visitors", min_value=1, step=1, value=variant['visitors'], key=f"visitors_{i}", 
-                            on_change=update_variant, args=(i, 'visitors', st.session_state[f"visitors_{i}"]))
+                            on_change=update_variant, args=(i, 'visitors'))
         with col3:
             st.number_input("Conversions", min_value=0, step=1, value=variant['conversions'], key=f"conversions_{i}", 
-                            on_change=update_variant, args=(i, 'conversions', st.session_state[f"conversions_{i}"]))
+                            on_change=update_variant, args=(i, 'conversions'))
         with col4:
             if len(st.session_state.variants) > 2:
                 st.button("Remove", key=f"remove_{i}", on_click=remove_variant, args=(i,))
