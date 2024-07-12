@@ -332,8 +332,8 @@ def abc_test_significance(quality_llm, system_prompt_ab_test):
     # Initialize session state for variants if it doesn't exist
     if 'variants' not in st.session_state:
         st.session_state.variants = [
-            {'name': 'A', 'visitors': 1000, 'conversions': 100},
-            {'name': 'B', 'visitors': 1000, 'conversions': 120}
+            {'name': 'Control', 'visitors': 1000, 'conversions': 100},
+            {'name': 'Treatment 1', 'visitors': 1000, 'conversions': 120}
         ]
     
     # Function to add a new variant
@@ -378,7 +378,7 @@ def abc_test_significance(quality_llm, system_prompt_ab_test):
     
     st.markdown("### Experiment Document (Optional)")
     st.markdown("Provide paste your experiment details/document here for more context-aware interpretation of the test results.")
-    prd_text = st.text_area("PRD", height=200, help="Paste your experiment document here (optional).")
+    prd_text = st.text_area("Experiment Details", height=200, help="Paste your experiment document here (optional).")
     
     if st.button("Calculate Significance"):
         # Prepare data for chi-square test
