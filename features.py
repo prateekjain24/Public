@@ -376,9 +376,9 @@ def abc_test_significance(quality_llm):
     
     significance_level = st.slider("Select Significance Level", min_value=0.01, max_value=0.10, value=0.05, step=0.01)
     
-    st.markdown("### Product Requirements Document (Optional)")
-    st.markdown("Provide your PRD here for more context-aware interpretation of the test results.")
-    prd_text = st.text_area("PRD", height=200, help="Paste your Product Requirements Document here (optional).")
+    st.markdown("### Experiment Document (Optional)")
+    st.markdown("Provide paste your experiment details/document here for more context-aware interpretation of the test results.")
+    prd_text = st.text_area("PRD", height=200, help="Paste your experiment document here (optional).")
     
     if st.button("Calculate Significance"):
         # Prepare data for chi-square test
