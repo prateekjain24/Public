@@ -375,52 +375,53 @@ def abc_test_significance(quality_llm):
             "the risk of a Type I error (false positive).")
     significance_level = st.slider("Significance Level", min_value=0.01, max_value=0.10, value=0.05, step=0.01)
     
-    if st.button("Calculate Significance"):
-        # Prepare data for chi-square test
-        observed = np.array([[v['conversions'], v['visitors'] - v['conversions']] for v in st.session_state.variants])
-        
-        # Perform chi-square test
-        chi2, p_value = stats.chi2_contingency(observed)[:2]
-        
-        # Calculate conversion rates and relative uplifts
-        rates = [v['conversions'] / v['visitors'] for v in st.session_state.variants]
-        control_rate = rates[0]
-        relative_uplifts = [(rate - control_rate) / control_rate * 100 for rate in rates[1:]]
-        
-        # Display results
-        st.markdown("### Results")
-        results_df = pd.DataFrame({
-            'Variant': [v['name'] for v in st.session_state.variants],
-            'Visitors': [v['visitors'] for v in st.session_state.variants],
-            'Conversions': [v['conversions'] for v in st.session_state.variants],
-            'Conversion Rate': rates
-        })
-        results_df['Relative Uplift'] = ['N/A'] + [f"{uplift:.2f}%" for uplift in relative_uplifts]
-        st.dataframe(results_df)
-        
-        st.markdown(f"**P-value:** {p_value:.4f}")
-        
-        if p_value < significance_level:
-            st.success(f"The result is statistically significant at the {significance_level:.0%} level.")
-        else:
-            st.warning(f"The result is not statistically significant at the {significance_level:.0%} level.")
-        
-        # Generate interpretation using the LLM
-        interpretation_prompt = f"""
-        Interpret the following A/B/C test results:
-        {results_df.to_string()}
-        
-        P-value: {p_value:.4f}
-        Significance Level: {significance_level:.0%}
-        
-        Provide a clear, concise interpretation of these A/B/C test results for a product manager. 
-        Include whether the result is statistically significant, what this means practically, 
-        and any recommendations or next steps based on these results. If there are multiple variants 
-        outperforming the control, discuss which one might be the best choice and why.
-        """
-        
-        quality_llm.system_prompt = "You are an expert data scientist specializing in A/B testing, A/B/C testing, and statistical analysis for product decisions."
-        interpretation, _, _ = quality_llm.generate_text(interpretation_prompt)
-        
-        st.markdown("### AI Interpretation")
-        st.markdown(interpretation)
+    with st.spinner('Generating Plan...'):
+        if st.button("Calculate Significance"):
+            # Prepare data for chi-square test
+            observed = np.array([[v['conversions'], v['visitors'] - v['conversions']] for v in st.session_state.variants])
+            
+            # Perform chi-square test
+            chi2, p_value = stats.chi2_contingency(observed)[:2]
+            
+            # Calculate conversion rates and relative uplifts
+            rates = [v['conversions'] / v['visitors'] for v in st.session_state.variants]
+            control_rate = rates[0]
+            relative_uplifts = [(rate - control_rate) / control_rate * 100 for rate in rates[1:]]
+            
+            # Display results
+            st.markdown("### Results")
+            results_df = pd.DataFrame({
+                'Variant': [v['name'] for v in st.session_state.variants],
+                'Visitors': [v['visitors'] for v in st.session_state.variants],
+                'Conversions': [v['conversions'] for v in st.session_state.variants],
+                'Conversion Rate': rates
+            })
+            results_df['Relative Uplift'] = ['N/A'] + [f"{uplift:.2f}%" for uplift in relative_uplifts]
+            st.dataframe(results_df)
+            
+            st.markdown(f"**P-value:** {p_value:.4f}")
+            
+            if p_value < significance_level:
+                st.success(f"The result is statistically significant at the {significance_level:.0%} level.")
+            else:
+                st.warning(f"The result is not statistically significant at the {significance_level:.0%} level.")
+            
+            # Generate interpretation using the LLM
+            interpretation_prompt = f"""
+            Interpret the following A/B/C test results:
+            {results_df.to_string()}
+            
+            P-value: {p_value:.4f}
+            Significance Level: {significance_level:.0%}
+            
+            Provide a clear, concise interpretation of these A/B/C test results for a product manager. 
+            Include whether the result is statistically significant, what this means practically, 
+            and any recommendations or next steps based on these results. If there are multiple variants 
+            outperforming the control, discuss which one might be the best choice and why.
+            """
+            
+            quality_llm.system_prompt = "You are an expert data scientist specializing in A/B testing, A/B/C testing, and statistical analysis for product decisions."
+            interpretation, _, _ = quality_llm.generate_text(interpretation_prompt)
+            
+            st.markdown("### AI Interpretation")
+            st.markdown(interpretation)
