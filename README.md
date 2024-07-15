@@ -89,7 +89,7 @@ Contributions to the PM Toolkit are welcome. Please ensure to follow the existin
 
 ## License
 
-[Add your license information here]
+MIT
 
 ## Support
 
