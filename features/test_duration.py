@@ -104,15 +104,36 @@ def plot_duration_vs_mde(df):
 def ab_test_duration_calculator():
     st.subheader("A/B Test Duration Calculator")
     
+    st.markdown("""
+    ### Key Terms:
+    - **Baseline Conversion Rate**: The current conversion rate of your product or feature.
+    - **Minimum Detectable Effect (MDE)**: The smallest improvement you want to be able to detect in your A/B test.
+    - **Significance Level**: The probability of detecting an effect that is not actually present (Type I error or false positive).
+    - **Statistical Power**: The probability of detecting an effect that is actually present (1 - Type II error rate).
+    - **Traffic Split**: The proportion of traffic allocated to each variant in the test.
+    """)
+    
     col1, col2 = st.columns(2)
     
     with col1:
         baseline_rate = st.slider("Baseline Conversion Rate (%)", 0.1, 50.0, 5.0, 0.1) / 100
+        st.info("This is your current conversion rate. For example, if 5% of visitors convert, enter 5.0.")
+        
         daily_visitors = st.number_input("Total Daily Visitors", min_value=10, value=1000, step=10)
+        st.info("The average number of visitors your product or feature receives per day.")
     
     with col2:
         alpha = st.slider("Significance Level", 0.01, 0.1, 0.05, 0.01, format="%.2f")
+        st.info("""
+        Common values are 0.05 (5%) or 0.01 (1%). A lower value means stricter criteria for statistical significance,
+        reducing false positives but potentially increasing false negatives.
+        """)
+        
         power = st.selectbox("Statistical Power", [0.7, 0.8, 0.9], index=1)
+        st.info("""
+        Common values are 0.8 (80%) or 0.9 (90%). Higher power increases the chance of detecting a true effect,
+        but also increases the required sample size.
+        """)
     
     traffic_splits = [0.1, 0.2, 0.5]
     
@@ -133,19 +154,26 @@ def ab_test_duration_calculator():
     
     st.markdown("### Key Insights:")
     st.markdown("""
-    - Smaller MDEs require longer test durations.
+    - Smaller MDEs require longer test durations to achieve statistical significance.
     - Allocating more traffic to the test (higher percentages) reduces the required duration.
     - There's a clear trade-off between test sensitivity (lower MDE) and test duration.
-    - Changing the significance level affects the required test duration.
+    - Changing the significance level affects the required test duration. A stricter (lower) significance level 
+      increases the test duration but reduces the chance of false positives.
     - The impact of traffic allocation is more pronounced for smaller MDEs.
     """)
     
     st.markdown("### Next Steps:")
     st.markdown("""
     1. Decide on your desired MDE based on what improvement would be meaningful for your product.
+       Consider both statistical and practical significance.
     2. Choose a traffic allocation that balances test duration with your ability to handle potential negative impacts.
-    3. If the test duration is too long, consider ways to increase your daily traffic or accept a larger MDE.
+       Higher allocations lead to faster tests but expose more users to potential negative effects.
+    3. If the test duration is too long, consider ways to increase your daily traffic, accept a larger MDE,
+       or adjust your significance level and power.
     4. Adjust the significance level based on your tolerance for false positives vs. false negatives.
+       A lower significance level (e.g., 0.01) reduces false positives but may increase false negatives and test duration.
+    5. Consider the trade-offs between statistical rigor (high power, low significance level) and practical constraints 
+       (test duration, traffic allocation) when designing your A/B test.
     """)
 
     # Add option to download the data
