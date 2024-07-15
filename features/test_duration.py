@@ -47,90 +47,110 @@ def estimate_test_duration(sample_size, daily_visitors, traffic_split=0.5):
     duration_days = np.ceil(sample_size / visitors_per_variant)
     return int(duration_days)
 
-def generate_time_series(baseline_rate, mde, daily_visitors, duration_days, traffic_split, alpha, power):
+def generate_scenarios(baseline_rate, mde, daily_visitors, traffic_split, alpha, power):
     """
-    Generate time series data for different scenarios based on confidence and power levels.
+    Generate scenarios for different parameter combinations.
     
     Args:
     baseline_rate (float): Baseline conversion rate
     mde (float): Minimum Detectable Effect
     daily_visitors (int): Total daily visitors
-    duration_days (int): Estimated test duration
     traffic_split (float): Proportion of traffic allocated to each variant
     alpha (float): Significance level
     power (float): Statistical power
     
     Returns:
-    pd.DataFrame: DataFrame with time series data
+    pd.DataFrame: DataFrame with scenario data
     """
-    days = np.arange(1, duration_days + 1)
-    visitors_per_variant = daily_visitors * traffic_split
+    scenarios = []
     
-    control_rate = baseline_rate
-    variation_rate = baseline_rate * (1 + mde)
+    # Baseline scenario
+    sample_size = calculate_sample_size(baseline_rate, mde, alpha, power)
+    duration = estimate_test_duration(sample_size, daily_visitors, traffic_split)
+    scenarios.append({
+        'Scenario': 'Baseline',
+        'Baseline Rate': baseline_rate,
+        'MDE': mde,
+        'Alpha': alpha,
+        'Power': power,
+        'Sample Size': sample_size,
+        'Duration (days)': duration
+    })
     
-    # Calculate standard error
-    se = np.sqrt((control_rate * (1 - control_rate) + variation_rate * (1 - variation_rate)) / visitors_per_variant)
+    # Varying MDE
+    for mde_factor in [0.5, 1.5, 2.0]:
+        new_mde = mde * mde_factor
+        sample_size = calculate_sample_size(baseline_rate, new_mde, alpha, power)
+        duration = estimate_test_duration(sample_size, daily_visitors, traffic_split)
+        scenarios.append({
+            'Scenario': f'MDE {mde_factor}x',
+            'Baseline Rate': baseline_rate,
+            'MDE': new_mde,
+            'Alpha': alpha,
+            'Power': power,
+            'Sample Size': sample_size,
+            'Duration (days)': duration
+        })
     
-    # Calculate critical values
-    z_alpha = stats.norm.ppf(1 - alpha / 2)
-    z_beta = stats.norm.ppf(power)
+    # Varying significance level
+    for new_alpha in [0.1, 0.01]:
+        sample_size = calculate_sample_size(baseline_rate, mde, new_alpha, power)
+        duration = estimate_test_duration(sample_size, daily_visitors, traffic_split)
+        scenarios.append({
+            'Scenario': f'Alpha {new_alpha}',
+            'Baseline Rate': baseline_rate,
+            'MDE': mde,
+            'Alpha': new_alpha,
+            'Power': power,
+            'Sample Size': sample_size,
+            'Duration (days)': duration
+        })
     
-    scenarios = {
-        'Expected (Power)': {'control': control_rate, 'variation': variation_rate},
-        'Barely Detectable': {'control': control_rate, 'variation': control_rate + z_beta * se},
-        'No Effect': {'control': control_rate, 'variation': control_rate},
-        'Negative Effect': {'control': control_rate, 'variation': control_rate - mde / 2}
-    }
+    # Varying power
+    for new_power in [0.7, 0.9]:
+        sample_size = calculate_sample_size(baseline_rate, mde, alpha, new_power)
+        duration = estimate_test_duration(sample_size, daily_visitors, traffic_split)
+        scenarios.append({
+            'Scenario': f'Power {new_power}',
+            'Baseline Rate': baseline_rate,
+            'MDE': mde,
+            'Alpha': alpha,
+            'Power': new_power,
+            'Sample Size': sample_size,
+            'Duration (days)': duration
+        })
     
-    data = []
-    for scenario, rates in scenarios.items():
-        for variant in ['control', 'variation']:
-            conversions = np.random.binomial(visitors_per_variant, rates[variant], duration_days).cumsum()
-            rate = conversions / (visitors_per_variant * days)
-            
-            data.extend([
-                {'Day': day, 'Scenario': scenario, 'Variant': variant.capitalize(), 'Conversion Rate': r}
-                for day, r in zip(days, rate)
-            ])
-    
-    return pd.DataFrame(data)
+    return pd.DataFrame(scenarios)
 
-def plot_time_series(df, baseline_rate, mde, alpha):
+def plot_scenarios(df):
     """
-    Create a plotly figure with time series for different scenarios.
+    Create a plotly figure with bar charts for sample size and duration.
     
     Args:
-    df (pd.DataFrame): DataFrame with time series data
-    baseline_rate (float): Baseline conversion rate
-    mde (float): Minimum Detectable Effect
-    alpha (float): Significance level
+    df (pd.DataFrame): DataFrame with scenario data
     
     Returns:
     go.Figure: Plotly figure object
     """
-    scenarios = df['Scenario'].unique()
-    fig = make_subplots(rows=len(scenarios), cols=1, shared_xaxes=True, vertical_spacing=0.05,
-                        subplot_titles=scenarios)
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1,
+                        subplot_titles=('Sample Size per Variant', 'Test Duration (Days)'))
     
-    colors = {'Control': '#1f77b4', 'Variation': '#ff7f0e'}
+    scenarios = df['Scenario']
     
-    for i, scenario in enumerate(scenarios, start=1):
-        scenario_data = df[df['Scenario'] == scenario]
-        for variant in ['Control', 'Variation']:
-            variant_data = scenario_data[scenario_data['Variant'] == variant]
-            fig.add_trace(
-                go.Scatter(x=variant_data['Day'], y=variant_data['Conversion Rate'],
-                           mode='lines', name=f"{scenario} - {variant}", line=dict(color=colors[variant])),
-                row=i, col=1
-            )
-        
-        fig.add_hline(y=baseline_rate, line_dash="dash", line_color="gray", row=i, col=1)
-        fig.add_hline(y=baseline_rate*(1+mde), line_dash="dash", line_color="red", row=i, col=1)
+    fig.add_trace(
+        go.Bar(x=scenarios, y=df['Sample Size'], name='Sample Size'),
+        row=1, col=1
+    )
+    
+    fig.add_trace(
+        go.Bar(x=scenarios, y=df['Duration (days)'], name='Duration'),
+        row=2, col=1
+    )
 
-    fig.update_layout(height=300*len(scenarios), title_text="A/B Test Scenarios", showlegend=False)
-    fig.update_xaxes(title_text="Days")
-    fig.update_yaxes(title_text="Conversion Rate", tickformat=".2%")
+    fig.update_layout(height=600, title_text="A/B Test Scenarios", showlegend=False)
+    fig.update_xaxes(title_text="Scenarios", row=2, col=1)
+    fig.update_yaxes(title_text="Sample Size", row=1, col=1)
+    fig.update_yaxes(title_text="Days", row=2, col=1)
     
     return fig
 
@@ -150,11 +170,11 @@ def ab_test_duration_calculator():
         traffic_split = st.slider("Traffic Split (% to each variant)", 10, 50, 50) / 100
     
     if st.button("Calculate Test Duration and Generate Scenarios"):
-        sample_size = calculate_sample_size(baseline_rate, mde, alpha, power)
-        duration = estimate_test_duration(sample_size, daily_visitors, traffic_split)
+        scenarios_df = generate_scenarios(baseline_rate, mde, daily_visitors, traffic_split, alpha, power)
         
-        st.success(f"Estimated test duration: {duration:.0f} days")
-        st.info(f"Required sample size per variant: {sample_size:.0f}")
+        st.success(f"Baseline scenario:")
+        st.info(f"Required sample size per variant: {scenarios_df.iloc[0]['Sample Size']:.0f}")
+        st.info(f"Estimated test duration: {scenarios_df.iloc[0]['Duration (days)']:.0f} days")
         
         st.markdown("### Test Details:")
         st.markdown(f"- Baseline conversion rate: {baseline_rate:.2%}")
@@ -163,26 +183,25 @@ def ab_test_duration_calculator():
         st.markdown(f"- Statistical power: {power}")
         st.markdown(f"- Traffic allocation: {traffic_split:.0%} to each variant")
         
-        # Generate and plot time series data
-        df = generate_time_series(baseline_rate, mde, daily_visitors, duration, traffic_split, alpha, power)
-        fig = plot_time_series(df, baseline_rate, mde, alpha)
+        # Plot scenarios
+        fig = plot_scenarios(scenarios_df)
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown("### Scenario Explanations:")
         st.markdown("""
-        - **Expected (Power)**: Shows the scenario where the variation performs exactly as expected (MDE).
-        - **Barely Detectable**: Illustrates the smallest effect size that can be detected with the specified power.
-        - **No Effect**: Demonstrates what the results might look like if there's no real difference between variants.
-        - **Negative Effect**: Shows a scenario where the variation performs worse than the control.
+        - **Baseline**: The scenario with the parameters you specified.
+        - **MDE 0.5x, 1.5x, 2x**: How sample size and duration change if the Minimum Detectable Effect is half, 1.5 times, or double the specified value.
+        - **Alpha 0.1, 0.01**: The effect of changing the significance level to 10% or 1%.
+        - **Power 0.7, 0.9**: The impact of changing the statistical power to 70% or 90%.
         """)
         
-        st.warning("Note: These scenarios are simulations based on the specified parameters and may not reflect actual test results. Always monitor your test closely and consider factors like seasonality and external events.")
+        st.warning("Note: These scenarios illustrate how different parameters affect the required sample size and test duration. Consider these trade-offs when planning your A/B test.")
 
-        # Add option to download the simulation data
-        csv = df.to_csv(index=False)
+        # Add option to download the scenario data
+        csv = scenarios_df.to_csv(index=False)
         st.download_button(
-            label="Download Simulation Data",
+            label="Download Scenario Data",
             data=csv,
-            file_name="ab_test_simulation.csv",
+            file_name="ab_test_scenarios.csv",
             mime="text/csv",
         )
