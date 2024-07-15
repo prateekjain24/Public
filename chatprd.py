@@ -13,7 +13,7 @@ from features.tracking import tracking_plan
 from features.gtm import gtm_planner
 from features.ab_test import abc_test_significance
 from features.test_duration import ab_test_duration_calculator
-from models import build_models
+from utils.models import build_models
 from utils.data_loading import load_prompts
 from storage.supabase_client import create_client
 import os
@@ -64,7 +64,7 @@ def main():
                 "Brainstorm Features", 
                 "Tracking Plan",
                 "Create GTM Plan",
-                "A/B/C Test Significance",
+                "A/B Test Significance",
                 "A/B Test Duration Calculator",
                 "View History"
             ],
@@ -80,7 +80,7 @@ def main():
             tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, quality_llm)
         elif option == "Create GTM Plan":
             gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm, quality_llm)
-        elif option == "A/B/C Test Significance":
+        elif option == "A/B Test Significance":
             abc_test_significance(quality_llm, system_prompt_ab_test)
         elif option == "A/B Test Duration Calculator":
             ab_test_duration_calculator()
