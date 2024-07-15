@@ -47,9 +47,9 @@ def estimate_test_duration(sample_size, daily_visitors, traffic_split=0.5):
     duration_days = np.ceil(sample_size / visitors_per_variant)
     return int(duration_days)
 
-def generate_time_series(baseline_rate, mde, daily_visitors, duration_days, traffic_split):
+def generate_time_series(baseline_rate, mde, daily_visitors, duration_days, traffic_split, alpha, power):
     """
-    Generate time series data for different scenarios.
+    Generate time series data for different scenarios based on confidence and power levels.
     
     Args:
     baseline_rate (float): Baseline conversion rate
@@ -57,6 +57,8 @@ def generate_time_series(baseline_rate, mde, daily_visitors, duration_days, traf
     daily_visitors (int): Total daily visitors
     duration_days (int): Estimated test duration
     traffic_split (float): Proportion of traffic allocated to each variant
+    alpha (float): Significance level
+    power (float): Statistical power
     
     Returns:
     pd.DataFrame: DataFrame with time series data
@@ -67,32 +69,34 @@ def generate_time_series(baseline_rate, mde, daily_visitors, duration_days, traf
     control_rate = baseline_rate
     variation_rate = baseline_rate * (1 + mde)
     
+    # Calculate standard error
+    se = np.sqrt((control_rate * (1 - control_rate) + variation_rate * (1 - variation_rate)) / visitors_per_variant)
+    
+    # Calculate critical values
+    z_alpha = stats.norm.ppf(1 - alpha / 2)
+    z_beta = stats.norm.ppf(power)
+    
     scenarios = {
-        'Expected': {'control': control_rate, 'variation': variation_rate},
+        'Expected (Power)': {'control': control_rate, 'variation': variation_rate},
+        'Barely Detectable': {'control': control_rate, 'variation': control_rate + z_beta * se},
         'No Effect': {'control': control_rate, 'variation': control_rate},
-        'Negative Effect': {'control': control_rate, 'variation': baseline_rate * (1 - mde/2)}
+        'Negative Effect': {'control': control_rate, 'variation': control_rate - mde / 2}
     }
     
     data = []
     for scenario, rates in scenarios.items():
-        control_conversions = np.random.binomial(visitors_per_variant, rates['control'], duration_days).cumsum()
-        variation_conversions = np.random.binomial(visitors_per_variant, rates['variation'], duration_days).cumsum()
-        
-        control_rate = control_conversions / (visitors_per_variant * days)
-        variation_rate = variation_conversions / (visitors_per_variant * days)
-        
-        data.extend([
-            {'Day': day, 'Scenario': scenario, 'Variant': 'Control', 'Conversion Rate': cr}
-            for day, cr in zip(days, control_rate)
-        ])
-        data.extend([
-            {'Day': day, 'Scenario': scenario, 'Variant': 'Variation', 'Conversion Rate': vr}
-            for day, vr in zip(days, variation_rate)
-        ])
+        for variant in ['control', 'variation']:
+            conversions = np.random.binomial(visitors_per_variant, rates[variant], duration_days).cumsum()
+            rate = conversions / (visitors_per_variant * days)
+            
+            data.extend([
+                {'Day': day, 'Scenario': scenario, 'Variant': variant.capitalize(), 'Conversion Rate': r}
+                for day, r in zip(days, rate)
+            ])
     
     return pd.DataFrame(data)
 
-def plot_time_series(df, baseline_rate, mde):
+def plot_time_series(df, baseline_rate, mde, alpha):
     """
     Create a plotly figure with time series for different scenarios.
     
@@ -100,6 +104,7 @@ def plot_time_series(df, baseline_rate, mde):
     df (pd.DataFrame): DataFrame with time series data
     baseline_rate (float): Baseline conversion rate
     mde (float): Minimum Detectable Effect
+    alpha (float): Significance level
     
     Returns:
     go.Figure: Plotly figure object
@@ -159,11 +164,19 @@ def ab_test_duration_calculator():
         st.markdown(f"- Traffic allocation: {traffic_split:.0%} to each variant")
         
         # Generate and plot time series data
-        df = generate_time_series(baseline_rate, mde, daily_visitors, duration, traffic_split)
-        fig = plot_time_series(df, baseline_rate, mde)
+        df = generate_time_series(baseline_rate, mde, daily_visitors, duration, traffic_split, alpha, power)
+        fig = plot_time_series(df, baseline_rate, mde, alpha)
         st.plotly_chart(fig, use_container_width=True)
         
-        st.warning("Note: These scenarios are simulations and may not reflect actual test results. Always monitor your test closely and consider factors like seasonality and external events.")
+        st.markdown("### Scenario Explanations:")
+        st.markdown("""
+        - **Expected (Power)**: Shows the scenario where the variation performs exactly as expected (MDE).
+        - **Barely Detectable**: Illustrates the smallest effect size that can be detected with the specified power.
+        - **No Effect**: Demonstrates what the results might look like if there's no real difference between variants.
+        - **Negative Effect**: Shows a scenario where the variation performs worse than the control.
+        """)
+        
+        st.warning("Note: These scenarios are simulations based on the specified parameters and may not reflect actual test results. Always monitor your test closely and consider factors like seasonality and external events.")
 
         # Add option to download the simulation data
         csv = df.to_csv(index=False)
