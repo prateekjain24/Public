@@ -18,7 +18,7 @@ from utils.data_loading import load_prompts
 from storage.supabase_client import create_client
 import os
 from supabase import create_client, Client
-from authentication import auth_screen 
+from utils.authentication import auth_screen 
 
 #from dotenv import load_dotenv
 #load_dotenv()
