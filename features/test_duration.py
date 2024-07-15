@@ -4,27 +4,8 @@ import pandas as pd
 from scipy import stats
 import plotly.graph_objects as go
 
-def calculate_sample_size(baseline_rate, mde, alpha, power):
-    p1 = baseline_rate
-    p2 = baseline_rate * (1 + mde)
-    
-    z_alpha = stats.norm.ppf(1 - alpha / 2)
-    z_beta = stats.norm.ppf(power)
-    
-    pooled_p = (p1 + p2) / 2
-    
-    n = ((z_alpha * np.sqrt(2 * pooled_p * (1 - pooled_p)) + 
-          z_beta * np.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) ** 2) / (p2 - p1) ** 2
-    
-    return int(np.ceil(n))
-
-def estimate_test_duration(sample_size, daily_visitors, traffic_split):
-    visitors_per_variant = daily_visitors * traffic_split
-    duration_days = np.ceil(sample_size / visitors_per_variant)
-    return int(duration_days)
-
 def generate_duration_mde_data(baseline_rate, daily_visitors, alpha, power, traffic_splits):
-    mde_range = np.linspace(0.01, 0.5, 100)  # 1% to 50% MDE
+    mde_range = np.linspace(0.01, 0.2, 100)  # 1% to 20% MDE
     data = []
     
     for traffic_split in traffic_splits:
@@ -42,13 +23,17 @@ def generate_duration_mde_data(baseline_rate, daily_visitors, alpha, power, traf
 def plot_duration_vs_mde(df):
     fig = go.Figure()
     
-    for split in df['Traffic Split'].unique():
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Blue, Orange, Green
+    
+    for i, split in enumerate(df['Traffic Split'].unique()):
         split_data = df[df['Traffic Split'] == split]
         fig.add_trace(go.Scatter(
             x=split_data['MDE'],
             y=split_data['Duration (days)'],
-            mode='lines',
-            name=f"{split} Traffic"
+            mode='lines+markers',
+            name=f"{split} Traffic",
+            line=dict(color=colors[i]),
+            marker=dict(size=4)
         ))
     
     fig.update_layout(
@@ -56,9 +41,33 @@ def plot_duration_vs_mde(df):
         xaxis_title='Minimum Detectable Effect (%)',
         yaxis_title='Test Duration (Days)',
         legend_title='Traffic Split',
-        hovermode="x unified"
+        hovermode="x unified",
+        plot_bgcolor='rgba(240, 240, 240, 0.8)',  # Light gray background
+        xaxis=dict(
+            tickmode='array',
+            tickvals=[1, 5, 10, 15, 20],
+            ticktext=['1%', '5%', '10%', '15%', '20%'],
+            gridcolor='white'
+        ),
+        yaxis=dict(
+            type='log',
+            dtick=1,
+            gridcolor='white'
+        )
     )
+    
     fig.update_traces(hovertemplate='MDE: %{x:.1f}%<br>Duration: %{y:.0f} days')
+    
+    # Add annotations for key points
+    for i, split in enumerate(df['Traffic Split'].unique()):
+        split_data = df[df['Traffic Split'] == split]
+        fig.add_annotation(
+            x=5, y=split_data[split_data['MDE'].round(1) == 5]['Duration (days)'].values[0],
+            text=f"{split} Traffic",
+            showarrow=False,
+            yshift=10,
+            font=dict(color=colors[i])
+        )
     
     return fig
 
@@ -85,17 +94,18 @@ def ab_test_duration_calculator():
         
         st.markdown("### How to use this chart:")
         st.markdown("""
-        1. The x-axis shows the Minimum Detectable Effect (MDE) - the smallest improvement you want to be able to detect.
-        2. The y-axis shows the required test duration in days.
+        1. The x-axis shows the Minimum Detectable Effect (MDE) from 1% to 20%.
+        2. The y-axis (logarithmic scale) shows the required test duration in days.
         3. Different lines represent different traffic allocation splits between control and variant.
         4. Hover over the lines to see exact values for MDE and duration.
         """)
         
         st.markdown("### Key Insights:")
         st.markdown("""
-        - Smaller MDEs require longer test durations.
+        - Smaller MDEs require exponentially longer test durations.
         - Allocating more traffic to the test (higher percentages) reduces the required duration.
-        - There's a trade-off between test sensitivity (lower MDE) and test duration.
+        - There's a significant trade-off between test sensitivity (lower MDE) and test duration.
+        - The impact of traffic allocation is more pronounced for smaller MDEs.
         """)
         
         st.markdown("### Next Steps:")
@@ -103,6 +113,7 @@ def ab_test_duration_calculator():
         1. Decide on your desired MDE based on what improvement would be meaningful for your product.
         2. Choose a traffic allocation that balances test duration with your ability to handle potential negative impacts.
         3. If the test duration is too long, consider ways to increase your daily traffic or accept a larger MDE.
+        4. For very small MDEs, consider if the potential improvement justifies the long test duration.
         """)
 
         # Add option to download the data
