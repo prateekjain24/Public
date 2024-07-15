@@ -118,14 +118,29 @@ def send_reset_password_email(email, supabase):
         st.error(f"Failed to send password reset email: {e}")
 
 def register_user(email, password, supabase):
+        # First, check if the user already exists
+    existing_user = supabase.table("users").select("*").eq("email", email).execute()
+    
+    if existing_user.data:
+        # User already exists
+        st.error("An account with this email already exists. Please use a different email or try logging in.")
+        return False
+    
+    # If the user doesn't exist, proceed with registration
     try:
-        response = supabase.auth.sign_up({"email": email, "password": password})
-        if response.user:
-            st.success("Registration successful. Please log in.")
+        res = supabase.auth.sign_up({
+            "email": email,
+            "password": password
+        })
+        if res.user:
+            st.success("Registration successful! Please check your email to verify your account.")
+            return True
         else:
             st.error("Registration failed. Please try again.")
+            return False
     except Exception as e:
-        st.error(f"Registration failed: {e}")
+        st.error(f"An error occurred during registration: {str(e)}")
+        return False
 
 def auth_screen(supabase):
     # Check for existing auth token
