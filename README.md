@@ -1,89 +1,96 @@
-# PRD Generator and Enhancer
+# PM Toolkit
 
-Welcome to the PRD Generator and Enhancer! This tool helps you create, improve, and brainstorm Product Requirement Documents (PRDs) using AI. It's designed to make your work easier and more efficient.
+PM Toolkit is a comprehensive Streamlit application designed to assist Product Managers with various tasks, including creating and improving Product Requirements Documents (PRDs), brainstorming features, generating tracking plans, creating Go-To-Market (GTM) plans, and analyzing A/B/C test results.
 
 ## Features
 
-- **Create New PRD**: Make a new Product Requirement Document from scratch.
-- **Improve Current PRD**: Make your existing PRD better.
-- **Brainstorm Features**: Get new ideas for your product.
-- **Generate Tracking Plan**: Create a detailed plan to track product features and details.
-- **View History**: Look back at all your interactions and documents.
+1. **Create PRD**: Generate a new Product Requirements Document using AI.
+2. **Improve PRD**: Enhance an existing PRD with AI-powered suggestions.
+3. **Brainstorm Features**: Engage in an interactive brainstorming session for new product features.
+4. **Tracking Plan**: Generate a detailed tracking plan for your product or feature.
+5. **Create GTM Plan**: Develop a Go-To-Market plan based on your PRD and additional details.
+6. **A/B/C Test Significance**: Analyze and interpret the results of A/B/C tests.
+7. **View History**: Access and review previously generated PRDs and plans.
 
 ## Installation
 
-To use this app, you need Python installed on your computer. Install the required libraries with this command:
+1. Clone the repository:
+   ```
+   git clone <repository-url>
+   cd pm-toolkit
+   ```
 
-```sh
-pip install -r requirements.txt
-```
+2. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-## How to Use
+3. Set up the necessary environment variables:
+   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `GROQ_API_KEY`: Your Groq API key
+   - `ANTHROPIC_API_KEY`: Your Anthropic API key
+   - `SUPABASE_URL`: Your Supabase project URL
+   - `SUPABASE_KEY`: Your Supabase API key
+   - `SUPABASE_TABLE`: Your Supabase table name for storing PRDs
+   - `SUPABASE_BRAINTORM_TABLE`: Your Supabase table name for storing brainstorming sessions
 
-### 1. Create New PRD
+## Usage
 
-1. **Enter Product Details**: Type in your product's name and description.
-2. **Generate PRD**: Click "Generate PRD" to create your document.
-3. **Review and Adjust**: The AI will draft the document, review it, and make improvements.
-4. **Download PRD**: Download the final PRD as a Markdown file.
-
-### 2. Improve Current PRD
-
-1. **Paste Existing PRD**: Enter your current PRD text.
-2. **Improve PRD**: Click "Improve PRD" to enhance it.
-3. **Review and Adjust**: The AI will suggest improvements and make changes.
-4. **Download Improved PRD**: Download the improved PRD as a Markdown file.
-
-### 3. Brainstorm Features
-
-1. **Start Brainstorming**: Enter your topic or question.
-2. **Interactive Session**: Chat with the AI to get ideas.
-3. **Review Suggestions**: Look at and refine the AI's suggestions.
-
-### 4. Generate Tracking Plan
-
-1. **Enter Feature Details**: Provide the feature name, customer type, and other details.
-2. **Generate Plan**: Click "Generate Tracking" to create your plan.
-3. **Review and Adjust**: The AI will draft the plan and suggest improvements.
-4. **Download Plan**: Download the tracking plan as a Markdown file.
-
-### 5. View History
-
-1. **View All Interactions**: See all your past interactions and documents.
-
-## Code Overview
-
-```python
-import streamlit as st
-from utils import download_audio
-from models import transcribe_audio
-
-def create_prd(system_prompt_prd, system_prompt_director, llm_model, fast_llm_model):
-    # Function to create a new PRD
-    ...
-
-def improve_prd(system_prompt_prd, system_prompt_director, llm_model):
-    # Function to improve an existing PRD
-    ...
-
-def brainstorm_features(system_prompt_brainstorm, llm_model):
-    # Function to brainstorm new features or ideas
-    ...
-
-def view_history():
-    # Function to view history of interactions and documents
-    ...
-
-def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model):
-    # Function to create a tracking plan
-    ...
+Run the Streamlit app:
 
 ```
+streamlit run chatprd.py
+```
+
+Navigate through the sidebar to access different features of the PM Toolkit.
+
+## Project Structure
+
+- `chatprd.py`: Main Streamlit application entry point
+- `features.py`: Contains implementations for various features (Create PRD, Improve PRD, etc.)
+- `models.py`: Handles the initialization and configuration of AI models
+- `storage.py`: Manages database operations with Supabase
+- `utils.py`: Utility functions for data loading, audio processing, etc.
+- `api/llm/`: Contains wrappers for different AI models (OpenAI, Groq, Anthropic)
+- `prompts.json`: Stores system prompts for different features
+
+## Dependencies
+
+- streamlit
+- openai
+- pandas
+- numpy
+- scipy
+- llm
+- groq
+- Pillow
+- anthropic
+- ffmpeg
+- yt-dlp
+- supabase
+- PyJWT
+- streamlit-cookies-controller
+- extra-streamlit-components
+
+## Authentication
+
+The app uses Supabase for user authentication. Users need to log in before accessing the toolkit features.
+
+## AI Models
+
+The toolkit uses multiple AI models for different tasks:
+- OpenAI's GPT-4
+- Groq's LLaMA 3 70B
+- Anthropic's Claude 3.5 Sonnet
 
 ## Contributing
 
-If you want to help improve this project, please fork the repository and submit a pull request. We welcome all improvements and fixes.
+Contributions to the PM Toolkit are welcome. Please ensure to follow the existing code style and add unit tests for any new features.
 
 ## License
 
-This project is licensed under the MIT License.
+[Add your license information here]
+
+## Support
+
+For any issues or feature requests, please open an issue on the GitHub repository.
