@@ -6,19 +6,12 @@ st.set_page_config(
     )
 
 # import llm
-from features.prd import create_prd, improve_prd
-from features.view_history import view_history
-from features.brainstorm import brainstorm_features
-from features.tracking import tracking_plan
-from features.gtm import gtm_planner
-from features.ab_test import abc_test_significance
-from features.test_duration import ab_test_duration_calculator
-from models import build_models
-from utils.data_loading import load_prompts
-from storage.supabase_client import create_client
 import os
-from supabase import create_client, Client
 from authentication import auth_screen 
+from features import create_prd, improve_prd, brainstorm_features, view_history, tracking_plan, gtm_planner, abc_test_significance
+from utils import load_prompts
+from models import build_models
+from supabase import create_client, Client
 
 #from dotenv import load_dotenv
 #load_dotenv()
@@ -39,12 +32,15 @@ def main():
     """
     prompts = load_prompts()
     fast_llm, quality_llm = build_models()
+    system_prompt_prd = prompts['system_prompt_prd']
     system_prompt_prd_experimental = prompts['system_prompt_prd_experimental']
     system_prompt_director = prompts['system_prompt_director']
     system_prompt_brainstorm = prompts['system_prompt_brainstorm']
     system_prompt_tracking = prompts['system_prompt_tracking']
     user_prompt_tracking = prompts['prompt_tracking_plan']
     system_prompt_directorDA = prompts['system_prompt_directorDA']
+    system_prompt_yt_planner = prompts['system_prompt_yt_planner']
+    prompt_yt_summary = prompts['prompt_yt_summary']
     system_prompt_GTM = prompts['system_prompt_GTM']
     system_prompt_GTM_critique = prompts['system_prompt_GTM_critique']
     system_prompt_ab_test = prompts['system_prompt_ab_test']
@@ -56,34 +52,23 @@ def main():
     # if st.session_state['authenticated']:
     if st.session_state['logged_in']:
         option = st.sidebar.radio(
-            "# Select the Task 👉",
-            key="task",
-            options=[
-                "Create PRD", 
-                "Improve PRD",
-                "Brainstorm Features", 
-                "Tracking Plan",
-                "Create GTM Plan",
-                "A/B/C Test Significance",
-                "A/B Test Duration Calculator",
-                "View History"
-            ],
-        )
-        
+                "# Select the Task 👉",
+                key="task",
+                options=["Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","A/B/C Test Significance","View History"],
+                )
+        #option = st.sidebar.selectbox("### Choose a feature", ("Create PRD", "Improve PRD","Brainstorm Features", "Tracking Plan","Create GTM Plan","View History"))
         if option == "Create PRD":
-            create_prd(system_prompt_prd_experimental, system_prompt_director, quality_llm, fast_llm, supabase)
+            create_prd(system_prompt_prd_experimental,system_prompt_director, quality_llm, fast_llm,supabase)
         elif option == "Improve PRD":
-            improve_prd(system_prompt_prd_experimental, system_prompt_director, quality_llm, supabase)
+            improve_prd(system_prompt_prd_experimental,system_prompt_director,quality_llm,supabase)
         elif option == "Brainstorm Features":
-            brainstorm_features(system_prompt_brainstorm, quality_llm, supabase)
+            brainstorm_features(system_prompt_brainstorm,quality_llm,supabase)
         elif option == "Tracking Plan":
             tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, quality_llm)
         elif option == "Create GTM Plan":
-            gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, fast_llm, quality_llm)
+            gtm_planner(system_prompt_GTM,system_prompt_GTM_critique, fast_llm, quality_llm)
         elif option == "A/B/C Test Significance":
             abc_test_significance(quality_llm, system_prompt_ab_test)
-        elif option == "A/B Test Duration Calculator":
-            ab_test_duration_calculator()
         elif option == "View History":
             view_history(supabase)
 
