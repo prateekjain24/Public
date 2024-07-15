@@ -4,6 +4,48 @@ import pandas as pd
 from scipy import stats
 import plotly.graph_objects as go
 
+def calculate_sample_size(baseline_rate, mde, alpha, power):
+    """
+    Calculate the required sample size for each variant in an A/B test.
+    
+    Args:
+    baseline_rate (float): The conversion rate of the control group
+    mde (float): Minimum Detectable Effect (relative change)
+    alpha (float): Significance level (typically 0.05)
+    power (float): Statistical power (typically 0.8)
+    
+    Returns:
+    int: Required sample size for each variant
+    """
+    p1 = baseline_rate
+    p2 = baseline_rate * (1 + mde)
+    
+    z_alpha = stats.norm.ppf(1 - alpha / 2)
+    z_beta = stats.norm.ppf(power)
+    
+    pooled_p = (p1 + p2) / 2
+    
+    n = ((z_alpha * np.sqrt(2 * pooled_p * (1 - pooled_p)) + 
+          z_beta * np.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) ** 2) / (p2 - p1) ** 2
+    
+    return int(np.ceil(n))
+
+def estimate_test_duration(sample_size, daily_visitors, traffic_split):
+    """
+    Estimate the test duration based on sample size and daily visitors.
+    
+    Args:
+    sample_size (int): Required sample size for each variant
+    daily_visitors (int): Total number of daily visitors
+    traffic_split (float): Proportion of traffic allocated to each variant
+    
+    Returns:
+    int: Estimated test duration in days
+    """
+    visitors_per_variant = daily_visitors * traffic_split
+    duration_days = np.ceil(sample_size / visitors_per_variant)
+    return int(duration_days)
+
 def generate_duration_mde_data(baseline_rate, daily_visitors, alpha, power, traffic_splits):
     mde_range = np.linspace(0.01, 0.2, 100)  # 1% to 20% MDE
     data = []
