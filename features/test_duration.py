@@ -47,6 +47,19 @@ def estimate_test_duration(sample_size, daily_visitors, traffic_split):
     return int(duration_days)
 
 def generate_duration_mde_data(baseline_rate, daily_visitors, alpha, power, traffic_splits):
+    """
+    Generate data for different MDEs and traffic splits.
+    
+    Args:
+    baseline_rate (float): Baseline conversion rate
+    daily_visitors (int): Total daily visitors
+    alpha (float): Significance level
+    power (float): Statistical power
+    traffic_splits (list): List of traffic split proportions to test
+    
+    Returns:
+    pd.DataFrame: DataFrame with MDE, duration, and traffic split data
+    """
     mde_range = np.linspace(0.01, 0.2, 100)  # 1% to 20% MDE
     data = []
     
@@ -63,6 +76,15 @@ def generate_duration_mde_data(baseline_rate, daily_visitors, alpha, power, traf
     return pd.DataFrame(data)
 
 def plot_duration_vs_mde(df):
+    """
+    Create a plotly figure with test duration vs MDE for different traffic splits.
+    
+    Args:
+    df (pd.DataFrame): DataFrame with MDE, duration, and traffic split data
+    
+    Returns:
+    go.Figure: Plotly figure object
+    """
     fig = go.Figure()
     
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Blue, Orange, Green
@@ -71,11 +93,11 @@ def plot_duration_vs_mde(df):
         split_data = df[df['Traffic Split'] == split]
         fig.add_trace(go.Scatter(
             x=split_data['MDE'],
-            y=split_data['Duration (days)'],
+            y=np.minimum(split_data['Duration (days)'], 90),  # Cap at 90 days
             mode='lines+markers',
             name=f"{split} Traffic",
-            line=dict(color=colors[i]),
-            marker=dict(size=4)
+            line=dict(color=colors[i], width=2),
+            marker=dict(size=6, symbol='circle')
         ))
     
     fig.update_layout(
@@ -84,32 +106,42 @@ def plot_duration_vs_mde(df):
         yaxis_title='Test Duration (Days)',
         legend_title='Traffic Split',
         hovermode="x unified",
-        plot_bgcolor='rgba(240, 240, 240, 0.8)',  # Light gray background
+        plot_bgcolor='white',
         xaxis=dict(
             tickmode='array',
-            tickvals=[1, 5, 10, 15, 20],
-            ticktext=['1%', '5%', '10%', '15%', '20%'],
-            gridcolor='white'
+            tickvals=[1, 2, 3, 4, 5, 10, 15, 20],
+            ticktext=['1%', '2%', '3%', '4%', '5%', '10%', '15%', '20%'],
+            gridcolor='lightgray',
+            minor_gridcolor='lightgray',
+            minor_ticks='inside'
         ),
         yaxis=dict(
-            type='log',
-            dtick=1,
-            gridcolor='white'
+            range=[0, 90],
+            tickmode='linear',
+            dtick=10,
+            gridcolor='lightgray',
+            minor_gridcolor='lightgray',
+            minor_ticks='inside'
         )
     )
     
     fig.update_traces(hovertemplate='MDE: %{x:.1f}%<br>Duration: %{y:.0f} days')
     
     # Add annotations for key points
-    for i, split in enumerate(df['Traffic Split'].unique()):
-        split_data = df[df['Traffic Split'] == split]
-        fig.add_annotation(
-            x=5, y=split_data[split_data['MDE'].round(1) == 5]['Duration (days)'].values[0],
-            text=f"{split} Traffic",
-            showarrow=False,
-            yshift=10,
-            font=dict(color=colors[i])
-        )
+    mde_points = [1, 2, 5, 10]
+    for mde in mde_points:
+        for i, split in enumerate(df['Traffic Split'].unique()):
+            split_data = df[df['Traffic Split'] == split]
+            duration = split_data[split_data['MDE'].round(1) == mde]['Duration (days)'].values[0]
+            if duration <= 90:
+                fig.add_annotation(
+                    x=mde,
+                    y=duration,
+                    text=f"{duration:.0f}d",
+                    showarrow=False,
+                    yshift=10,
+                    font=dict(size=8, color=colors[i])
+                )
     
     return fig
 
@@ -137,16 +169,18 @@ def ab_test_duration_calculator():
         st.markdown("### How to use this chart:")
         st.markdown("""
         1. The x-axis shows the Minimum Detectable Effect (MDE) from 1% to 20%.
-        2. The y-axis (logarithmic scale) shows the required test duration in days.
+        2. The y-axis shows the required test duration in days, capped at 90 days.
         3. Different lines represent different traffic allocation splits between control and variant.
         4. Hover over the lines to see exact values for MDE and duration.
+        5. Annotations show test duration for key MDE points (1%, 2%, 5%, 10%).
         """)
         
         st.markdown("### Key Insights:")
         st.markdown("""
-        - Smaller MDEs require exponentially longer test durations.
+        - Smaller MDEs require significantly longer test durations.
         - Allocating more traffic to the test (higher percentages) reduces the required duration.
-        - There's a significant trade-off between test sensitivity (lower MDE) and test duration.
+        - There's a clear trade-off between test sensitivity (lower MDE) and test duration.
+        - For very small MDEs (< 2%), test durations can become impractically long.
         - The impact of traffic allocation is more pronounced for smaller MDEs.
         """)
         
