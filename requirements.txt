@@ -15,3 +15,5 @@ streamlit-cookies-controller
 anthropic
 extra-streamlit-components
 plotly==5.18.0
+uvicorn
+fastapi
