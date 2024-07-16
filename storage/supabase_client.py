@@ -93,24 +93,6 @@ def create_data_prd(user, product_name, product_description, output, is_create_n
     }
     return data
 
-def create_data_brainstorm(user, message, is_user):
-    """
-    Create a data dictionary for brainstorming.
-
-    Args:
-        user (str): The user's name.
-        message (str): The brainstorming message.
-        is_user (bool): Indicates whether the message is from the user or bot.
-
-    Returns:
-        dict: A dictionary containing the user, message, and is_user values.
-    """
-    data = {
-        'user': user,
-        'message': message,
-        'is_user': is_user
-    }
-    return data
 
 
 # Add any additional Supabase-related functions as needed

@@ -1,9 +1,10 @@
 import streamlit as st
 from storage.supabase_client import create_record, read_records
-from utils.data_loading import create_data_prd
+from utils.data_loading import create_tracking_plan
 import os
 
-def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model):
+tracking_table = os.environ.get('SUPABASE_TRACKING_TABLE')
+def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, llm_model, supabase):
     """
     Generate a tracking plan for a given feature, customer type, additional details, and PRD text.
 
@@ -64,6 +65,13 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                     )                                          
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
+                    # save the data
+                    # create_tracking_plan(user, product_name,customer_type, additional_details, prd, output)
+                    data = create_tracking_plan(st.session_state['user']['email'], feature_name, customer_name, other_details, prd_text,response)
+                    try:
+                        create_record(tracking_table, data, supabase)
+                    except Exception as e:
+                        st.error(f"Failed to save PRD to database. Error: {str(e)}")
                     # Download button for the plan
                     st.download_button(
                         label="Download Tracking Plan as Markdown",

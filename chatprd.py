@@ -77,7 +77,7 @@ def main():
         elif option == "Brainstorm Features":
             brainstorm_features(system_prompt_brainstorm, gpt4_llm, supabase)
         elif option == "Tracking Plan":
-            tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, claude_llm)
+            tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_directorDA, claude_llm, supabase)
         elif option == "Create GTM Plan":
             gtm_planner(system_prompt_GTM, system_prompt_GTM_critique, gpt4_llm, claude_llm)
         elif option == "A/B Test Significance":

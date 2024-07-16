@@ -127,5 +127,29 @@ def parse_ab_test_data(data_input):
     except ValueError:
         st.error("Invalid data format. Please ensure each line is in the format: Variant Name, Visitors, Conversions")
         return None
+    
+def create_tracking_plan(user, product_name,customer_type, additional_details, prd, output):
+    """
+    Create a data dictionary with the provided parameters.
+
+    Args:
+        user (str): The user associated with the data.
+        product_name (str): The name of the product.
+        input_prompt (str): The input prompt for the product.
+        output (str): The output of the product.
+        is_create_new (bool): Flag indicating whether to create a new record.
+
+    Returns:
+        dict: The data dictionary.
+    """
+    data = {
+        'user': user,
+        'feature_name': product_name,
+        'customer_type':customer_type,
+        'additional_details': additional_details,
+        'prd': prd,
+        'output': output
+    }
+    return data
 
 # Add any additional data loading or preparation functions as needed
