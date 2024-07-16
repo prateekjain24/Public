@@ -107,7 +107,7 @@ def ab_test_duration_calculator():
     st.markdown("""
     ### Key Terms:
     - **Baseline Conversion Rate**: The current conversion rate of your product or feature.
-    - **Minimum Detectable Effect (MDE)**: The smallest improvement you want to be able to detect in your A/B test.
+    - **Minimum Detectable Effect (MDE): The smallest improvement you want to be able to detect in your A/B test. E.g. If your baseline conversion is 5% & MDE is 10%, then you're aiming to detect a minimum absolute improvement of 0.5 percentage points (to 5.5%) or greater.
     - **Significance Level**: The probability of detecting an effect that is not actually present (Type I error or false positive).
     - **Statistical Power**: The probability of detecting an effect that is actually present (1 - Type II error rate).
     - **Traffic Split**: The proportion of traffic allocated to each variant in the test.
