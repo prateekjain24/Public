@@ -60,13 +60,12 @@ def tracking_plan(system_prompt_tracking, user_prompt_tracking, system_prompt_di
                     st.info(status_message)
                     llm_model.system_prompt = system_prompt_tracking
                     response, input_tokens, output_tokens = llm_model.generate_text(
-                        prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown format. BE VERY DETAILED. If you think user is not asking for tracking plan return nothing.",
+                        prompt = f"Given the Feedback from your manager:{critique_response} \n Improve upon your draft tracking plan {draft_plan}. \n Only respond with the tracking plan and in Markdown. BE VERY DETAILED. If you think user is not asking for tracking plan return nothing.",
                         temperature=0.1                    
                     )                                          
                     st.markdown(response, unsafe_allow_html=True)
                     st.session_state['history'].append({'role': 'user', 'content': response})
                     # save the data
-                    # create_tracking_plan(user, product_name,customer_type, additional_details, prd, output)
                     data = create_tracking_plan(st.session_state['user']['email'], feature_name, customer_name, other_details, prd_text,response)
                     try:
                         create_record(tracking_table, data, supabase)
