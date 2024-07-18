@@ -116,5 +116,7 @@ async def transcribe_audio(
         raise HTTPException(status_code=500, detail=f"Transcription error: {str(e)}")
 
 
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8024)
     #uvicorn main:app --host 0.0.0.0 --port $PORT
     
