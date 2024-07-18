@@ -5,6 +5,7 @@ import uvicorn
 from llm.openai_llm import OpenAIWrapper
 from llm.groq_llm import GroqWrapper
 from llm.whisper_wrapper import WhisperWrapper
+from llm.groq_stt_wrapper import GroqSTTWrapper
 #from dotenv import load_dotenv
 import os
 import tempfile
@@ -66,13 +67,18 @@ async def generate_text(request: GenerateTextRequest):
 @app.post("/transcribe-audio", response_model=TranscribeAudioResponse)
 async def transcribe_audio(
     audio_file: UploadFile = File(...),
-    language: Optional[str] = Form(None, description="The language of the input audio in ISO-639-1 format."),
+    provider: str = Form(..., description="The provider to use for transcription. Either 'openai' or 'groq'."),
+    language: Optional[str] = Form(None, description="The language of the input audio."),
     prompt: Optional[str] = Form(None, description="An optional text to guide the model's style or continue a previous audio segment."),
     response_format: str = Form("json", description="The format of the transcript output."),
     temperature: float = Form(0.0, description="The sampling temperature, between 0 and 1."),
-    timestamp_granularities: Optional[List[str]] = Query(None, description="The timestamp granularities to populate for this transcription.")
+    timestamp_granularities: Optional[List[str]] = Query(None, description="The timestamp granularities to populate for this transcription (OpenAI only).")
 ):
     try:
+        # Check if the provider is valid
+        if provider not in ["openai", "groq"]:
+            raise HTTPException(status_code=400, detail="Invalid provider. Choose either 'openai' or 'groq'.")
+
         # Check if the file is in a supported format
         supported_formats = ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"]
         file_extension = os.path.splitext(audio_file.filename)[1][1:].lower()
@@ -84,17 +90,20 @@ async def transcribe_audio(
             temp_audio.write(audio_file.file.read())
             temp_audio_path = temp_audio.name
 
-        # Initialize WhisperWrapper
-        whisper_client = WhisperWrapper()
+        # Initialize the appropriate wrapper based on the provider
+        if provider == "openai":
+            transcription_client = WhisperWrapper()
+        else:  # provider == "groq"
+            transcription_client = GroqSTTWrapper()
 
         # Transcribe the audio
-        transcription = whisper_client.transcribe(
+        transcription = transcription_client.transcribe(
             temp_audio_path,
             language=language,
             prompt=prompt,
             response_format=response_format,
             temperature=temperature,
-            timestamp_granularities=timestamp_granularities
+            timestamp_granularities=timestamp_granularities if provider == "openai" else None
         )
 
         # Delete the temporary file
@@ -109,3 +118,5 @@ async def transcribe_audio(
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8024)
+    #uvicorn main:app --host 0.0.0.0 --port $PORT
+    
