@@ -15,7 +15,7 @@ import tempfile
 app = FastAPI()
 
 class GenerateTextRequest(BaseModel):
-    provider: str = Field(..., description="The text generation service provider, e.g., 'groq' or 'openai'.")
+    provider: str = Field(..., description="The text generation service provider, e.g., 'groq', 'anthropic' or 'openai'.")
     model: str = Field(..., description="The model identifier, specifying which language model to use for text generation. gpt4, llama3-8b-8192, llama3-70b-8192")
     prompt: str = Field(..., description="The input prompt to the language model based on which the text is generated.")
     temperature: float = Field(0.5, description="Controls the randomness of the output. Lower values make it more deterministic.")
@@ -48,8 +48,12 @@ async def generate_text(request: GenerateTextRequest):
                 max_tokens=request.max_tokens,
                 temperature=request.temperature,
             )
+        elif request.provider == "groq":
+            client = GroqWrapper(model=request.model, system_prompt=request.system_instructions)
+        elif request.provider == "anthropic":
+            client = AnthropicWrapper(model=request.model, system_prompt=request.system_instructions)
         else:
-            client = GroqWrapper(model=request.model,system_prompt=request.system_instructions)
+            raise HTTPException(status_code=400, detail="Invalid provider. Choose 'openai', 'groq', or 'anthropic'.")
             generated_text, input_tokens, output_tokens = client.generate_text(
                 prompt=request.prompt,
                 max_tokens=request.max_tokens,
