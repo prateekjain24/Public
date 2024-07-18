@@ -1,5 +1,6 @@
 import os
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+import base64
 
 class AnthropicWrapper:
     def __init__(self, api_key=None, model="claude-3-5-sonnet-20240620", system_prompt=None):
@@ -57,3 +58,46 @@ class AnthropicWrapper:
             response.usage.input_tokens,
             response.usage.output_tokens
         )
+    
+
+    def image_to_text(self, 
+                      image_path: str, 
+                      prompt: str = "Describe this image in detail.",
+                      max_tokens: int = 1000) -> str:
+        """
+        Convert an image to text description using Claude.
+
+        Parameters:
+        - image_path (str): Path to the image file.
+        - prompt (str): The prompt to guide Claude's description. Default is "Describe this image in detail."
+        - max_tokens (int): The maximum number of tokens to generate. Default is 1000.
+
+        Returns:
+        - str: The generated text description of the image.
+        """
+        with open(image_path, "rb") as image_file:
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/jpeg",
+                                    "data": image_file.read().decode("utf-8")
+                                }
+                            },
+                            {
+                                "type": "text",
+                                "text": prompt
+                            }
+                        ]
+                    }
+                ]
+            )
+        
+        return response.content[0].text

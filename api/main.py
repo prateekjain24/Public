@@ -6,6 +6,7 @@ from llm.openai_llm import OpenAIWrapper
 from llm.groq_llm import GroqWrapper
 from llm.whisper_wrapper import WhisperWrapper
 from llm.groq_stt_wrapper import GroqSTTWrapper
+from llm.anthropic_llm import AnthropicWrapper
 #from dotenv import load_dotenv
 import os
 import tempfile
@@ -31,6 +32,10 @@ class GenerateTextResponse(BaseModel):
 
 class TranscribeAudioResponse(BaseModel):
     transcription: str = Field(..., description="The transcribed text or JSON object from the audio file.")
+
+class ImageToTextResponse(BaseModel):
+    description: str = Field(..., description="The text description generated from the image.")
+
 
 
 @app.post("/generate-text", response_model=GenerateTextResponse)
@@ -118,6 +123,48 @@ async def transcribe_audio(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Transcription error: {str(e)}")
 
+@app.post("/image-to-text", response_model=ImageToTextResponse)
+async def image_to_text(
+    image_file: UploadFile = File(...),
+    provider: str = Form(..., description="The provider to use for image-to-text conversion. Either 'openai' or 'anthropic'."),
+    prompt: str = Form("Describe this image in detail.", description="The prompt to guide the model's description."),
+    max_tokens: int = Form(1000, description="The maximum number of tokens to generate.")
+):
+    try:
+        # Check if the provider is valid
+        if provider not in ["openai", "anthropic"]:
+            raise HTTPException(status_code=400, detail="Invalid provider. Choose either 'openai' or 'anthropic'.")
+
+        # Check if the file is an image
+        if not image_file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Uploaded file is not an image.")
+
+        # Save the uploaded file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_image:
+            temp_image.write(image_file.file.read())
+            temp_image_path = temp_image.name
+
+        # Initialize the appropriate wrapper based on the provider
+        if provider == "openai":
+            client = OpenAIWrapper()
+        else:  # provider == "anthropic"
+            client = AnthropicWrapper()
+
+        # Convert image to text
+        description = client.image_to_text(
+            image_path=temp_image_path,
+            prompt=prompt,
+            max_tokens=max_tokens
+        )
+
+        # Delete the temporary file
+        os.unlink(temp_image_path)
+
+        return ImageToTextResponse(description=description)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image-to-text conversion error: {str(e)}")
 
 
 if __name__ == "__main__":
