@@ -90,21 +90,24 @@ async def transcribe_audio(
             temp_audio.write(audio_file.file.read())
             temp_audio_path = temp_audio.name
 
-        # Initialize the appropriate wrapper based on the provider
+        # Prepare common parameters
+        common_params = {
+            "language": language,
+            "prompt": prompt,
+            "response_format": response_format,
+            "temperature": temperature
+        }
+
+        # Initialize the appropriate wrapper and transcribe based on the provider
         if provider == "openai":
             transcription_client = WhisperWrapper()
+            if timestamp_granularities:
+                common_params["timestamp_granularities"] = timestamp_granularities
         else:  # provider == "groq"
             transcription_client = GroqSTTWrapper()
 
         # Transcribe the audio
-        transcription = transcription_client.transcribe(
-            temp_audio_path,
-            language=language,
-            prompt=prompt,
-            response_format=response_format,
-            temperature=temperature,
-            timestamp_granularities=timestamp_granularities if provider == "openai" else None
-        )
+        transcription = transcription_client.transcribe(temp_audio_path, **common_params)
 
         # Delete the temporary file
         os.unlink(temp_audio_path)
@@ -114,6 +117,7 @@ async def transcribe_audio(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Transcription error: {str(e)}")
+
 
 
 if __name__ == "__main__":
