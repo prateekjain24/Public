@@ -11,10 +11,10 @@ class ReplicateWrapper:
         Parameters:
         - api_key (str): Your Replicate API key. If not provided, it will try to fetch from environment variables.
         """
-        self.api_key = api_key or os.getenv("REPLICATE_API_KEY")
+        self.api_key = api_key or os.getenv("REPLICATE_API_TOKEN")
         if not self.api_key:
             raise ValueError("API key must be provided either as a parameter or set in the environment variables.")
-        os.environ["REPLICATE_API_TOKEN"] = self.api_key
+        #os.environ["REPLICATE_API_TOKEN"] = self.api_key
 
     def text_to_image(self, 
                       prompt: str, 
