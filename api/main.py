@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, BackgroundTasks
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import uvicorn
@@ -7,6 +7,7 @@ from llm.groq_llm import GroqWrapper
 from llm.whisper_wrapper import WhisperWrapper
 from llm.groq_stt_wrapper import GroqSTTWrapper
 from llm.anthropic_llm import AnthropicWrapper
+from llm.replicate_wrapper import ReplicateWrapper
 #from dotenv import load_dotenv
 import os
 import tempfile
@@ -36,6 +37,18 @@ class TranscribeAudioResponse(BaseModel):
 class ImageToTextResponse(BaseModel):
     description: str = Field(..., description="The text description generated from the image.")
 
+class TextToImageRequest(BaseModel):
+    prompt: str = Field(..., description="The text description of the image to generate.")
+    aspect_ratio: str = Field("3:2", description="The aspect ratio of the generated image.")
+    model: str = Field("stability-ai/stable-diffusion-3", description="The model to use for image generation.")
+
+class TextToImageResponse(BaseModel):
+    task_id: str = Field(..., description="The ID of the image generation task.")
+
+class TextToImageStatusResponse(BaseModel):
+    status: str = Field(..., description="The status of the image generation task.")
+    image_url: Optional[str] = Field(None, description="The URL of the generated image, if available.")
+    error: Optional[str] = Field(None, description="Error message, if any.")
 
 
 @app.post("/generate-text", response_model=GenerateTextResponse)
@@ -169,6 +182,41 @@ async def image_to_text(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image-to-text conversion error: {str(e)}")
+
+@app.post("/text-to-image", response_model=TextToImageResponse)
+async def text_to_image(request: TextToImageRequest, background_tasks: BackgroundTasks):
+    try:
+        replicate_client = ReplicateWrapper()
+        
+        # Start the image generation task
+        prediction = replicate_client.text_to_image(
+            prompt=request.prompt,
+            aspect_ratio=request.aspect_ratio,
+            model=request.model
+        )
+        
+        # Return the task ID immediately
+        return TextToImageResponse(task_id=prediction.id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Text-to-image generation error: {str(e)}")
+
+@app.get("/text-to-image/{task_id}", response_model=TextToImageStatusResponse)
+async def get_text_to_image_status(task_id: str):
+    try:
+        replicate_client = ReplicateWrapper()
+        status = replicate_client.get_prediction_status(task_id)
+        
+        response = TextToImageStatusResponse(status=status["status"])
+        if status["status"] == "succeeded":
+            response.image_url = status["output"][0] if status["output"] else None
+        elif status["status"] == "failed":
+            response.error = status["error"]
+        
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error checking text-to-image status: {str(e)}")
+
+
 
 
 if __name__ == "__main__":

@@ -18,3 +18,4 @@ plotly==5.18.0
 uvicorn
 fastapi
 python-multipart
+replicate
