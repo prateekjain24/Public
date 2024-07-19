@@ -39,15 +39,15 @@ class ReplicateWrapper:
             **kwargs
         }
         
-        prediction = replicate.predictions.create(
-            version=model,
+        prediction = replicate.models.predictions.create(
+            model,
             input=input_data
         )
         
         while prediction.status != "succeeded":
-            time.sleep(1)
+            time.sleep(2)
             prediction.reload()
-            if prediction.status == "failed":
+            if prediction.status in {"failed" , "canceled"}:
                 raise Exception("Image generation failed")
 
         return prediction.output[0]  # Return the URL of the generated image
