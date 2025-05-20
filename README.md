@@ -10,7 +10,8 @@ PM Toolkit is a comprehensive Streamlit application designed to assist Product M
 4. **Tracking Plan**: Generate a detailed tracking plan for your product or feature.
 5. **Create GTM Plan**: Develop a Go-To-Market plan based on your PRD and additional details.
 6. **A/B Test Significance**: Analyze and interpret the results of A/B tests.
-7. **View History**: Access and review previously generated PRDs and plans.
+7. **A/B Test Duration Calculator**: Calculate the required duration for an A/B test.
+8. **View History**: Access and review previously generated PRDs and plans.
 
 ## Installation
 
@@ -47,11 +48,13 @@ Navigate through the sidebar to access different features of the PM Toolkit.
 
 - `chatprd.py`: Main Streamlit application entry point
 - `features/`: Contains implementations for various features (Create PRD, Improve PRD, etc.)
-- `models.py`: Handles the initialization and configuration of AI models
+- `utils/models.py`: Handles the initialization and configuration of AI models
 - `storage/`: Manages database operations with Supabase
 - `utils/`: Utility functions for data loading, audio processing, etc.
 - `api/`: Contains API-related files and wrappers for different AI models (OpenAI, Groq, Anthropic)
 - `prompts.json`: Stores system prompts for different features
+- `ai_gen_code/`: Contains examples of AI-generated code (e.g., `snake.py`).
+- `notebooks/`: Jupyter notebooks used for experimentation, testing, and exploration.
 
 ## API
 
